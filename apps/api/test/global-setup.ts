@@ -42,4 +42,12 @@ export default async function setup(): Promise<void> {
     cwd: REPO_ROOT,
     env: { ...process.env, DATABASE_URL: testUrl },
   });
+
+  // The catalogue has to be in the test database too: every question endpoint joins content on
+  // disk against a synced row, so without this the API would correctly report an empty catalogue
+  // and the tests would pass while testing nothing.
+  await run('pnpm', ['--filter', '@code-lift/content', 'run', 'sync'], {
+    cwd: REPO_ROOT,
+    env: { ...process.env, DATABASE_URL: testUrl },
+  });
 }

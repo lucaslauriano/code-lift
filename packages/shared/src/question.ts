@@ -1,5 +1,11 @@
 import { z } from 'zod';
-import { companySchema, difficultySchema, questionTypeSchema, topicSchema } from './enums';
+import {
+  companySchema,
+  difficultySchema,
+  progressStatusSchema,
+  questionTypeSchema,
+  topicSchema,
+} from './enums';
 
 /**
  * A single test case. `input` is the argument list spread into the solution function, so a
@@ -46,8 +52,45 @@ export type QuestionMeta = z.infer<typeof questionMetaSchema>;
 export const questionSummarySchema = questionMetaSchema.extend({
   isPremium: z.boolean(),
   contentVersion: z.string(),
-  progressStatus: z.enum(['todo', 'in_progress', 'done', 'skipped']),
+  progressStatus: progressStatusSchema,
   bookmarked: z.boolean(),
   lastAttemptAt: z.string().datetime().nullable(),
 });
 export type QuestionSummary = z.infer<typeof questionSummarySchema>;
+
+/**
+ * Everything the workspace needs to let you start solving — and nothing more.
+ *
+ * No solution, no editorial, no hidden cases: those are separate requests so that a mock session
+ * can withhold them, and so the first paint does not ship a 100k-element performance input.
+ */
+export const questionDetailSchema = z.object({
+  meta: questionMetaSchema,
+  progressStatus: progressStatusSchema,
+  bookmarked: z.boolean(),
+  /** Statement, as MDX source. Rendered by the web app. */
+  prompt: z.string(),
+  /** The file the editor opens with. */
+  starter: z.string(),
+  /** Only the cases a Run executes. */
+  publicCases: z.array(testCaseSchema),
+  /** Shown as "N hidden · M performance" without revealing them. */
+  hiddenCaseCount: z.number().int().nonnegative(),
+  perfCaseCount: z.number().int().nonnegative(),
+});
+export type QuestionDetail = z.infer<typeof questionDetailSchema>;
+
+/** Fetched only when Submit runs. Includes the hidden and performance cases. */
+export const questionCasesSchema = z.object({
+  slug: z.string(),
+  cases: z.array(testCaseSchema),
+});
+export type QuestionCases = z.infer<typeof questionCasesSchema>;
+
+/** Withheld while a mock session covering this question is still running. */
+export const questionEditorialSchema = z.object({
+  slug: z.string(),
+  solution: z.string(),
+  editorial: z.string(),
+});
+export type QuestionEditorial = z.infer<typeof questionEditorialSchema>;

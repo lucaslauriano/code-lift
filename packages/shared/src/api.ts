@@ -54,6 +54,8 @@ export const createSubmissionRequestSchema = z.object({
   status: submissionStatusSchema,
   passedCases: z.number().int().nonnegative(),
   totalCases: z.number().int().nonnegative(),
+  perfPassed: z.number().int().nonnegative().default(0),
+  perfTotal: z.number().int().nonnegative().default(0),
   durationMs: z.number().nonnegative(),
   mockSessionId: z.string().optional(),
 });
@@ -67,11 +69,20 @@ export const submissionSchema = z.object({
   status: submissionStatusSchema,
   passedCases: z.number().int().nonnegative(),
   totalCases: z.number().int().nonnegative(),
+  perfPassed: z.number().int().nonnegative(),
+  perfTotal: z.number().int().nonnegative(),
   durationMs: z.number().nonnegative(),
   mockSessionId: z.string().nullable(),
   createdAt: z.string(),
 });
 export type Submission = z.infer<typeof submissionSchema>;
+
+export const createSubmissionResponseSchema = z.object({
+  submission: submissionSchema,
+  /** The progress status after this submission — a clean submit flips the question to done. */
+  progressStatus: progressStatusSchema,
+});
+export type CreateSubmissionResponse = z.infer<typeof createSubmissionResponseSchema>;
 
 /* ------------------------------------------------------------ progress -- */
 
@@ -142,6 +153,13 @@ export const mockSessionSchema = z.object({
   results: z.array(mockQuestionResultSchema).nullable(),
 });
 export type MockSession = z.infer<typeof mockSessionSchema>;
+
+/**
+ * Wrapped rather than a bare nullable session: Nest serializes a `null` return value as an empty
+ * body, so the client would receive `{}` and read `undefined` off it instead of seeing "no session".
+ */
+export const activeMockSessionSchema = z.object({ session: mockSessionSchema.nullable() });
+export type ActiveMockSession = z.infer<typeof activeMockSessionSchema>;
 
 export const TOPTAL_CODILITY_PRESET = {
   durationMinutes: 90,

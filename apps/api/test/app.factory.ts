@@ -1,11 +1,14 @@
 import { resolve } from 'node:path';
 import { config } from 'dotenv';
 import cookieParser from 'cookie-parser';
+import request from 'supertest';
+import type { Server } from 'node:http';
 import { Test } from '@nestjs/testing';
 import type { INestApplication } from '@nestjs/common';
 import { AppModule } from '../src/app.module';
 import { PrismaService } from '../src/prisma/prisma.service';
 import { AuthService } from '../src/auth/auth.service';
+import { SESSION_COOKIE } from '../src/config/env';
 
 config({ path: resolve(__dirname, '../../../.env'), quiet: true });
 
@@ -40,6 +43,20 @@ export async function createTestApp(): Promise<TestApp> {
       await app.close();
     },
   };
+}
+
+/** Logs in over HTTP and returns the Set-Cookie value, ready to hand to `.set('Cookie', …)`. */
+export async function signIn(server: Server, email: string, password: string): Promise<string> {
+  const response = await request(server).post('/auth/login').send({ email, password });
+  if (response.status !== 200) {
+    throw new Error(`sign-in failed with ${response.status}: ${JSON.stringify(response.body)}`);
+  }
+  const raw = response.headers['set-cookie'];
+  const cookie = (Array.isArray(raw) ? raw : []).find((value: string) =>
+    value.startsWith(`${SESSION_COOKIE}=`),
+  );
+  if (!cookie) throw new Error('sign-in returned no session cookie');
+  return cookie;
 }
 
 export async function createUser(
