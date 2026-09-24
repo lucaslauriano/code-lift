@@ -41,7 +41,9 @@ services:
     ports:
       - '${API_PORT:-3334}:${API_PORT:-3334}'
     healthcheck:
-      test: ['CMD-SHELL', 'wget -qO- http://localhost:${API_PORT:-3334}/health || exit 1']
+      # 127.0.0.1, not localhost: inside the container localhost resolves to ::1 first and Node
+      # listens on IPv4 only, so the probe would fail against a perfectly healthy API.
+      test: ['CMD-SHELL', 'wget -qO- http://127.0.0.1:${API_PORT:-3334}/health || exit 1']
       interval: 10s
       timeout: 5s
       retries: 10

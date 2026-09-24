@@ -7,7 +7,7 @@ WORKDIR /repo
 FROM base AS deps
 # Native builds (argon2, prisma engines) need a toolchain that the runtime image does not.
 RUN apk add --no-cache python3 make g++ openssl
-COPY pnpm-workspace.yaml package.json .npmrc ./
+COPY pnpm-workspace.yaml pnpm-lock.yaml package.json .npmrc ./
 COPY apps/api/package.json apps/api/
 COPY packages/config/package.json packages/config/
 COPY packages/db/package.json packages/db/

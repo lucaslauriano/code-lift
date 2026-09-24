@@ -4,7 +4,7 @@ WORKDIR /repo
 
 FROM base AS deps
 RUN apk add --no-cache python3 make g++
-COPY pnpm-workspace.yaml package.json .npmrc ./
+COPY pnpm-workspace.yaml pnpm-lock.yaml package.json .npmrc ./
 COPY apps/web/package.json apps/web/
 COPY packages/config/package.json packages/config/
 COPY packages/db/package.json packages/db/
