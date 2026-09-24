@@ -64,6 +64,9 @@ pnpm test:e2e
 - **O model do Monaco existe antes de o React ligar o listener de mudança.** Um `setValue`
   programático nessa janela atualiza o editor e mais nada — a tela fica certa e o run executa o
   starter. O helper `setEditorValue` nos testes reescreve até o rascunho persistido bater.
+- **O documento não rola, por construção.** `html, body { height: 100%; overflow: hidden }` em
+  `globals.css`. O shell é dono do scroll e cada painel rola sozinho. Telas fora do shell (login)
+  precisam do próprio `overflow-y-auto`.
 - **Todo container de scroll precisa de `relative`.** `overflow` sozinho **não** cria bloco de
   contenção, então qualquer descendente `absolute` — todo `sr-only`, por exemplo — se ancora no
   documento e o estica. A página inteira passa a rolar e o header e a sidebar somem junto.

@@ -40,7 +40,9 @@ export default async function AppLayout({
           one — anchors to the document instead and stretches it, which makes the whole page
           scroll and drags the header and sidebar out of view.
         */}
-        <main className="relative min-w-0 flex-1 overflow-y-auto">{children}</main>
+        <main className="relative min-w-0 flex-1 overflow-y-auto overscroll-contain">
+          {children}
+        </main>
       </div>
     </div>
   );

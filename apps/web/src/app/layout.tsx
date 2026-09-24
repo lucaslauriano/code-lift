@@ -21,7 +21,7 @@ export default function RootLayout({
 }: Readonly<{ children: React.ReactNode }>): React.ReactElement {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className="min-h-dvh antialiased">
+      <body className="h-full antialiased">
         <ThemeProvider>
           <QueryProvider>{children}</QueryProvider>
           <Toaster position="bottom-right" richColors closeButton />

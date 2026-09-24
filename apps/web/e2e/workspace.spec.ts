@@ -152,6 +152,34 @@ test.describe('layout', () => {
     });
   }
 
+  test('the page does not move when the wheel keeps going past the end of the list', async ({
+    page,
+  }) => {
+    await page.goto('/questions');
+    await expect(page.getByText('39 questions')).toBeVisible();
+
+    // Programmatic scrollTo stops at the end; a wheel does not. This is the gesture that used to
+    // hand the scroll over to the document and take the header and sidebar with it.
+    for (let i = 0; i < 40; i += 1) await page.mouse.wheel(0, 600);
+
+    const state = await page.evaluate(() => ({
+      docScrollTop: document.scrollingElement!.scrollTop,
+      bodyOverflowY: getComputedStyle(document.body).overflowY,
+    }));
+    expect(state.docScrollTop).toBe(0);
+    expect(state.bodyOverflowY).toBe('hidden');
+    await expect(page.getByRole('link', { name: 'code-lift' })).toBeInViewport();
+  });
+
+  test('the login screen still scrolls itself on a short window', async ({ browser }) => {
+    // The document is locked, so any screen outside the app shell has to own its scrolling.
+    const context = await browser.newContext({ viewport: { width: 900, height: 360 } });
+    const fresh = await context.newPage();
+    await fresh.goto('http://localhost:3010/login');
+    await expect(fresh.getByRole('button', { name: 'Sign in' })).toBeVisible();
+    await context.close();
+  });
+
   test('the header and sidebar stay put when the list is scrolled to the bottom', async ({
     page,
   }) => {

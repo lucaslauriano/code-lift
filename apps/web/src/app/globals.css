@@ -20,13 +20,27 @@
   --color-success: var(--success);
   --color-warning: var(--warning);
   --radius-card: var(--radius);
-  --font-mono:
-    ui-monospace, 'SFMono-Regular', 'JetBrains Mono', 'Menlo', 'Consolas', monospace;
+  --font-mono: ui-monospace, 'SFMono-Regular', 'JetBrains Mono', 'Menlo', 'Consolas', monospace;
 }
 
 @layer base {
   * {
     border-color: var(--border);
+  }
+
+  /*
+   * The app shell owns scrolling: the header and sidebar are fixed and each pane scrolls itself.
+   * Locking the document is what makes that true no matter what. Without it, anything that
+   * escapes a scroll container — an absolutely positioned descendant, a stray tall element —
+   * silently makes the whole page scroll and drags the chrome out of view.
+   *
+   * overscroll-behavior stops a pane that has hit its end from handing the gesture to the page.
+   */
+  html,
+  body {
+    height: 100%;
+    overflow: hidden;
+    overscroll-behavior: none;
   }
 
   html {
