@@ -23,29 +23,52 @@ Monolito: um repositório, um `docker compose up`.
    metadados sincronizados e os dados do usuário.
 3. **Uma questão só entra no banco se a solução de referência passar em todos os próprios casos.**
 
-## Começando
+## Rodando
+
+Antes de qualquer coisa, uma vez:
 
 ```bash
-cp .env.example .env     # ajuste SEED_USER_PASSWORD e JWT_SECRET
-pnpm install
-pnpm db:up               # sobe só o Postgres em container
-pnpm db:migrate
-pnpm db:seed             # cria o usuário e sincroniza o conteúdo
-pnpm dev                 # web em :3000, api em :3333
+cp .env.example .env
 ```
 
-Tudo em container (o caminho do "critério de pronto"):
+E edite duas linhas do `.env` — o app avisa no boot enquanto a senha for o placeholder:
+
+```
+JWT_SECRET=            # openssl rand -hex 32
+SEED_USER_PASSWORD=    # a senha com que você vai entrar
+```
+
+### Tudo em container
 
 ```bash
 docker compose up
 ```
 
+Sobe Postgres, API e web. Na primeira vez aplica as migrations, cria o usuário e sincroniza as
+questões. Abra **http://localhost:3010** e entre com `SEED_USER_EMAIL` / `SEED_USER_PASSWORD`.
+
+### Dia a dia
+
+Só o banco em container, o resto local com hot reload:
+
+```bash
+pnpm install
+pnpm db:up               # Postgres em :5434
+pnpm db:migrate
+pnpm db:seed             # cria o usuário
+pnpm content:sync        # sincroniza as questões
+pnpm dev                 # web em :3010, api em :3334 (docs em /docs)
+```
+
+> As portas não são as convencionais (3000/3333/5432) porque esta máquina já as usava. Todas vêm
+> do `.env`, então mude à vontade.
+
 ## Comandos
 
 ```
 pnpm dev · pnpm build · pnpm test · pnpm typecheck · pnpm lint
-pnpm content:validate · pnpm content:sync · pnpm db:migrate · pnpm db:seed
-pnpm test:e2e
+pnpm content:validate · pnpm content:sync · pnpm db:up · pnpm db:migrate · pnpm db:seed
+pnpm test:e2e            # Playwright; exige os servidores já no ar
 ```
 
 ## Notas de implementação
