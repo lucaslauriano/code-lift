@@ -1,0 +1,12 @@
+{
+  "slug": "max-counters",
+  "title": "Max Counters",
+  "type": "algo",
+  "difficulty": "medium",
+  "summary": "Apply increase and max-counter operations to N counters without ever touching them all.",
+  "topics": ["counting", "arrays"],
+  "companies": ["toptal"],
+  "estimatedMinutes": 25,
+  "source": "toptal-style",
+  "expectedComplexity": { "time": "O(N + M)", "space": "O(N)" }
+}

@@ -1,0 +1,12 @@
+{
+  "slug": "triangle",
+  "title": "Triangle",
+  "type": "algo",
+  "difficulty": "medium",
+  "summary": "Decide whether an array contains three values that can form a triangle.",
+  "topics": ["sorting", "greedy", "arrays"],
+  "companies": ["toptal"],
+  "estimatedMinutes": 20,
+  "source": "toptal-style",
+  "expectedComplexity": { "time": "O(N log N)", "space": "O(N)" }
+}

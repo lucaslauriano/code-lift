@@ -1,0 +1,24 @@
+An array `A` consisting of `N` integers is given. `N` is an **odd** integer, and each element of the
+array can be paired with another element that has the same value — except for one element that is
+left unpaired.
+
+For example, in the array `[9, 3, 9, 3, 9, 7, 9]` the elements at indexes 0 and 2 have value 9, the
+elements at indexes 1 and 3 have value 3, and the elements at indexes 4 and 6 have value 9. The
+element at index 5 has value 7 and is unpaired.
+
+Write a function that, given an array `A`, returns the value of the unpaired element.
+
+## Examples
+
+| A | answer |
+| --- | --- |
+| `[9, 3, 9, 3, 9, 7, 9]` | `7` |
+| `[42]` | `42` |
+| `[1, 1, 2]` | `2` |
+
+## Assumptions
+
+- `N` is an odd integer within the range `[1 .. 1,000,000]`.
+- Each element of `A` is an integer within the range `[1 .. 1,000,000,000]`.
+- All but one of the values in `A` occur an even number of times.
+- Expected worst-case space complexity is `O(1)`.

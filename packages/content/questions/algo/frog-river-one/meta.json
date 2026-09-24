@@ -1,0 +1,12 @@
+{
+  "slug": "frog-river-one",
+  "title": "Frog River One",
+  "type": "algo",
+  "difficulty": "medium",
+  "summary": "Find the earliest time a frog can cross a river, when leaves fall one per second.",
+  "topics": ["arrays", "counting", "hashing"],
+  "companies": ["toptal"],
+  "estimatedMinutes": 20,
+  "source": "toptal-style",
+  "expectedComplexity": { "time": "O(N)", "space": "O(X)" }
+}

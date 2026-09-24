@@ -1,0 +1,12 @@
+{
+  "slug": "passing-cars",
+  "title": "Passing Cars",
+  "type": "algo",
+  "difficulty": "medium",
+  "summary": "Count pairs of cars travelling in opposite directions, bailing out past one billion.",
+  "topics": ["prefix-sums", "arrays", "counting"],
+  "companies": ["toptal"],
+  "estimatedMinutes": 20,
+  "source": "toptal-style",
+  "expectedComplexity": { "time": "O(N)", "space": "O(1)" }
+}

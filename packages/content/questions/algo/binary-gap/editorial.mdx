@@ -1,0 +1,53 @@
+## A ideia central
+
+Percorra os bits do menos significativo para o mais significativo contando zeros, mas só comece a
+contar depois de ver o primeiro `1`. Um gap só vale quando um `1` o fecha — é isso que faz os zeros
+finais de `32` (`100000`) nunca contarem.
+
+## A solução ingênua
+
+O reflexo é `n.toString(2)` seguido de `split('1')` e pegar o maior pedaço do meio. Funciona, mas
+aloca uma string e um array a cada chamada, e a lógica de "descartar as pontas" vira um caso especial
+que quase todo mundo erra: `split('1')` sobre `100000` devolve `['', '00000']`, e o `'00000'` **não**
+é um gap. Não é que estoure o tempo — é que erra silenciosamente.
+
+## A solução ótima
+
+Um único laço sobre os bits, com três variáveis:
+
+- `seenOne` — já entramos no número? Enquanto for falso, zeros são zeros à direita e se descartam.
+- `current` — quantos zeros desde o último `1`.
+- `longest` — o maior `current` **já fechado** por um `1`.
+
+A ordem importa: `longest` só é atualizado no ramo do `1`. Quando o laço acaba, um `current`
+pendente é justamente o rabo não fechado, e ele morre sem ser considerado.
+
+```ts
+if (bit === 1) {
+  if (seenOne && current > longest) longest = current;
+  seenOne = true;
+  current = 0;
+} else if (seenOne) {
+  current += 1;
+}
+```
+
+**Complexidade:** tempo `O(log N)` (no máximo 31 iterações), espaço `O(1)`.
+
+## Armadilhas
+
+- **Zeros à direita.** `32 -> 0`, não `5`. É o caso que mais reprova.
+- **Zeros à esquerda não existem.** Comece a contar só depois do primeiro `1`.
+- **`N = 1`.** Um único bit, sem gap. Resposta `0`.
+- **`>>` vs `>>>`.** Com `N` até 2.147.483.647 você está no limite do inteiro de 32 bits com sinal.
+  Use o shift sem sinal (`>>>`) para não cair num laço infinito se alguém passar um valor com o bit
+  de sinal aceso.
+- **Não use `parseInt(..., 2)` de volta.** Converter ida e volta é perda de tempo e de precisão.
+
+## O que o avaliador da Toptal está medindo aqui
+
+Esta é a questão de aquecimento do Codility, e ela avalia três coisas antes de qualquer algoritmo:
+se você lê o enunciado com atenção (a definição de "cercado por uns nos dois lados" está lá,
+explícita), se você cobre os casos de borda sem precisar de dica, e se você escolhe uma passagem em
+`O(log N)` com espaço constante em vez da manipulação de string. Acertar os 100% aqui rápido é o que
+te compra tempo para as duas questões seguintes — que é onde a prova é realmente decidida.

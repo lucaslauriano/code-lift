@@ -1,0 +1,12 @@
+{
+  "slug": "cyclic-rotation",
+  "title": "Cyclic Rotation",
+  "type": "algo",
+  "difficulty": "easy",
+  "summary": "Rotate an array to the right a given number of times.",
+  "topics": ["arrays", "math"],
+  "companies": ["toptal"],
+  "estimatedMinutes": 15,
+  "source": "toptal-style",
+  "expectedComplexity": { "time": "O(N)", "space": "O(N)" }
+}

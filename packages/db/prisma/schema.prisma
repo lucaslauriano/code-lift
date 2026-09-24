@@ -1,0 +1,245 @@
+// code-lift — one database, two kinds of rows:
+//   * synced content metadata (Question, QuizQuestion, Deck, Flashcard), whose source of truth is
+//     packages/content on disk. `content:sync` upserts these; nothing else writes them.
+//   * user data (everything with a userId), which only exists here.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum QuestionType {
+  algo
+  js
+  ui
+  system_design
+}
+
+enum Difficulty {
+  easy
+  medium
+  hard
+}
+
+enum SubmissionStatus {
+  passed
+  failed
+  error
+  timeout
+}
+
+enum ProgressStatus {
+  todo
+  in_progress
+  done
+  skipped
+}
+
+enum MockPreset {
+  toptal_codility
+  custom
+}
+
+enum QuizFormat {
+  mcq
+  open
+}
+
+enum FlashcardRating {
+  again
+  hard
+  good
+  easy
+}
+
+model User {
+  id           String   @id @default(cuid())
+  email        String   @unique
+  passwordHash String
+  name         String?
+  createdAt    DateTime @default(now())
+
+  submissions      Submission[]
+  progress         Progress[]
+  mockSessions     MockSession[]
+  quizAttempts     QuizAttempt[]
+  flashcardReviews FlashcardReview[]
+  bookmarks        Bookmark[]
+  designNotes      SystemDesignNote[]
+}
+
+model Question {
+  id               String       @id @default(cuid())
+  slug             String       @unique
+  type             QuestionType
+  title            String
+  summary          String
+  difficulty       Difficulty
+  topics           String[]
+  companies        String[]
+  estimatedMinutes Int
+  isPremium        Boolean      @default(false)
+  /// sha256 of the question folder; how `content:sync` detects a change.
+  contentVersion   String
+  updatedAt        DateTime     @updatedAt
+
+  submissions Submission[]
+  progress    Progress[]
+  bookmarks   Bookmark[]
+
+  @@index([type, difficulty])
+}
+
+model Submission {
+  id            String           @id @default(cuid())
+  userId        String
+  questionId    String
+  language      String
+  code          String
+  status        SubmissionStatus
+  passedCases   Int
+  totalCases    Int
+  /// Number of performance cases that passed, so the mock score can weigh them separately.
+  perfPassed    Int              @default(0)
+  perfTotal     Int              @default(0)
+  durationMs    Int
+  mockSessionId String?
+  createdAt     DateTime         @default(now())
+
+  user        User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  question    Question     @relation(fields: [questionId], references: [id], onDelete: Cascade)
+  mockSession MockSession? @relation(fields: [mockSessionId], references: [id], onDelete: SetNull)
+
+  @@index([userId, questionId, createdAt])
+  @@index([mockSessionId])
+}
+
+model Progress {
+  userId        String
+  questionId    String
+  status        ProgressStatus @default(todo)
+  lastAttemptAt DateTime?
+  updatedAt     DateTime       @updatedAt
+
+  user     User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  question Question @relation(fields: [questionId], references: [id], onDelete: Cascade)
+
+  @@id([userId, questionId])
+  @@index([userId, status])
+}
+
+model Bookmark {
+  userId     String
+  questionId String
+  createdAt  DateTime @default(now())
+
+  user     User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  question Question @relation(fields: [questionId], references: [id], onDelete: Cascade)
+
+  @@id([userId, questionId])
+}
+
+model MockSession {
+  id          String     @id @default(cuid())
+  userId      String
+  preset      MockPreset
+  questionIds String[]
+  startedAt   DateTime   @default(now())
+  /// Authoritative deadline. The client timer is presentation only.
+  endsAt      DateTime
+  finishedAt  DateTime?
+  score       Float?
+
+  user        User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  submissions Submission[]
+
+  @@index([userId, startedAt])
+}
+
+model QuizQuestion {
+  id             String     @id @default(cuid())
+  slug           String     @unique
+  topic          String
+  format         QuizFormat
+  contentVersion String
+  updatedAt      DateTime   @updatedAt
+
+  attempts QuizAttempt[]
+}
+
+model QuizAttempt {
+  id             String   @id @default(cuid())
+  userId         String
+  quizQuestionId String
+  answer         String
+  isCorrect      Boolean
+  createdAt      DateTime @default(now())
+
+  user         User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  quizQuestion QuizQuestion @relation(fields: [quizQuestionId], references: [id], onDelete: Cascade)
+
+  @@index([userId, createdAt])
+}
+
+model Deck {
+  id        String   @id @default(cuid())
+  slug      String   @unique
+  title     String
+  topic     String
+  updatedAt DateTime @updatedAt
+
+  cards Flashcard[]
+}
+
+model Flashcard {
+  id             String   @id @default(cuid())
+  deckId         String
+  slug           String   @unique
+  front          String
+  back           String
+  contentVersion String
+  updatedAt      DateTime @updatedAt
+
+  deck    Deck              @relation(fields: [deckId], references: [id], onDelete: Cascade)
+  reviews FlashcardReview[]
+}
+
+/// Mirrors the `Card` shape of ts-fsrs so a review round-trips without translation loss.
+model FlashcardReview {
+  id            String    @id @default(cuid())
+  userId        String
+  flashcardId   String
+  stability     Float
+  difficulty    Float
+  elapsedDays   Int       @default(0)
+  scheduledDays Int       @default(0)
+  learningSteps Int       @default(0)
+  reps          Int       @default(0)
+  lapses        Int       @default(0)
+  /// ts-fsrs State: 0 New, 1 Learning, 2 Review, 3 Relearning.
+  state         Int       @default(0)
+  due           DateTime
+  lastReview    DateTime?
+
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  flashcard Flashcard @relation(fields: [flashcardId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, flashcardId])
+  @@index([userId, due])
+}
+
+model SystemDesignNote {
+  id             String   @id @default(cuid())
+  userId         String
+  questionSlug   String
+  body           String
+  checkedItems   String[]
+  updatedAt      DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, questionSlug])
+}

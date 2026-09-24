@@ -1,0 +1,62 @@
+## A ideia central
+
+Todo carro para oeste (`1`) forma par com **todos** os carros para leste (`0`) que vieram antes dele.
+Então basta uma passagem da esquerda para a direita mantendo quantos `0` já apareceram.
+
+## A solução ingênua
+
+```ts
+let pairs = 0;
+for (let p = 0; p < a.length; p++) {
+  if (a[p] !== 0) continue;
+  for (let q = p + 1; q < a.length; q++) {
+    if (a[q] === 1) pairs++;
+  }
+}
+```
+
+`O(N^2)`. Com `N = 100.000` são 5×10^9 iterações — não termina. É literalmente a definição do
+enunciado transcrita em código, o que a torna tentadora.
+
+## A solução ótima
+
+```ts
+let eastboundSoFar = 0;
+let pairs = 0;
+
+for (const car of a) {
+  if (car === 0) {
+    eastboundSoFar++;
+  } else {
+    pairs += eastboundSoFar;      // este 1 fecha par com todos os 0 anteriores
+    if (pairs > 1_000_000_000) return -1;
+  }
+}
+return pairs;
+```
+
+Isso é uma soma de prefixo disfarçada: `eastboundSoFar` é o prefixo de zeros, e a resposta é o
+somatório desse prefixo em cada posição onde há um `1`.
+
+**Complexidade:** tempo `O(N)`, espaço `O(1)`.
+
+## Armadilhas
+
+- **O teto de 1.000.000.000.** É a parte que mais reprova. Com `N = 100.000` o máximo teórico é
+  `50.000 × 50.000 = 2,5 × 10^9`, que está **acima** do limite — o enunciado existe para isso.
+  Verifique dentro do laço, não no fim.
+- **`-1` não é "erro".** É a resposta esperada quando estoura. Retornar o número grande é errado
+  mesmo que o cálculo esteja certo.
+- **Overflow de verdade em outras linguagens.** Em JS, `2,5 × 10^9` cabe folgado num `double`
+  (`Number.MAX_SAFE_INTEGER` é ~9×10^15), então o risco aqui é lógico, não numérico. Em Java/C# com
+  `int` de 32 bits (teto ~2,1×10^9) isso é overflow real — é por isso que o enunciado do Codility
+  insiste nesse limite.
+- **Contar na direção errada.** Par é `(leste antes, oeste depois)`. `[1, 0]` responde `0`.
+- **Array de um elemento.** Sempre `0`, não importa a direção.
+
+## O que o avaliador da Toptal está medindo aqui
+
+Duas coisas independentes: se você reconhece soma de prefixo (transformar um laço duplo num contador
+acumulado) e se você lê a condição de guarda até o fim. É comum o candidato acertar o algoritmo e
+perder pontos por ignorar o `-1` — e do ponto de vista do avaliador isso é pior do que errar o
+algoritmo, porque sinaliza que você implementa antes de terminar de ler a especificação.

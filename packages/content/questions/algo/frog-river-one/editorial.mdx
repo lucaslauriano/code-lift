@@ -1,0 +1,66 @@
+## A ideia central
+
+Uma passagem para frente, marcando cada posição **na primeira vez** que uma folha cai nela e
+contando quantas posições distintas já foram cobertas. A resposta é o índice em que esse contador
+chega a `X`.
+
+## A solução ingênua
+
+Depois de cada folha, verificar se o trecho inteiro está coberto:
+
+```ts
+for (let t = 0; t < a.length; t++) {
+  covered.add(a[t]);
+  if (allCovered(covered, x)) return t;   // varre 1..X de novo
+}
+```
+
+`allCovered` custa `O(X)` e roda a cada folha: `O(N * X)`. Com `N = X = 100.000` são 10^10
+verificações. Não termina.
+
+A variante `new Set(a.slice(0, t + 1)).size === x` é ainda pior — reconstrói o conjunto inteiro a
+cada passo, `O(N^2)` só de alocação.
+
+## A solução ótima
+
+Manter o contador de forma incremental. Cada folha faz uma de duas coisas, ambas `O(1)`:
+
+```ts
+const covered = new Uint8Array(x + 1);
+let remaining = x;
+
+for (let time = 0; time < a.length; time++) {
+  const position = a[time];
+  if (covered[position] === 0) {
+    covered[position] = 1;
+    remaining--;
+    if (remaining === 0) return time;     // saída imediata
+  }
+}
+return -1;
+```
+
+O `Uint8Array` não é essencial (um `Set` ou um array de booleanos serve), mas é alocação contígua e
+zerada de graça — e deixa explícito que o espaço é `O(X)`.
+
+**Complexidade:** tempo `O(N)`, espaço `O(X)`.
+
+## Armadilhas
+
+- **Retornar o índice, não o tamanho.** A resposta é o **tempo** (índice base 0) em que a travessia
+  fica possível, não a contagem de folhas. `X = 1, A = [1]` devolve `0`.
+- **Não sair cedo.** Se você continuar o laço depois de completar o trecho, sobrescreve a resposta
+  ou devolve o último índice. Retorne na hora.
+- **`X > N`.** Impossível cobrir `X` posições com menos de `X` folhas: tem que devolver `-1`.
+- **Contar folhas em vez de posições distintas.** `A = [1, 1, 1]` com `X = 2` tem três folhas e uma
+  posição. A resposta é `-1`.
+- **Índice 0 do array de cobertura.** As posições vão de `1` a `X`, então aloque `X + 1` e ignore o
+  índice `0` — ou você terá um off-by-one silencioso.
+
+## O que o avaliador da Toptal está medindo aqui
+
+É a primeira questão da prova onde a solução ingênua **passa em todos os casos pequenos** e falha só
+nos grandes. O avaliador está vendo se você identifica, antes de rodar, que "verificar o estado
+completo a cada passo" é o padrão que transforma `O(N)` em `O(N*X)` — e se você sabe trocar isso por
+um contador incremental. É também onde se separa quem lê o enunciado até o fim: a garantia
+`1 <= A[K] <= X` é o que permite indexar direto no array de cobertura sem validação.

@@ -1,0 +1,67 @@
+## A ideia central
+
+Uma pilha resolve tudo: empilhe cada abertura e, a cada fechamento, confira se o topo é a abertura
+correspondente. No fim, a pilha tem que estar vazia.
+
+## A solução ingênua
+
+O truque do "vai removendo pares até não mudar mais":
+
+```ts
+let previous;
+do {
+  previous = s;
+  s = s.replace('()', '').replace('[]', '').replace('{}', '');
+} while (s !== previous);
+return s.length === 0 ? 1 : 0;
+```
+
+Funciona e é `O(N^2)` — cada `replace` varre a string inteira e realoca, e no caso `"((((…))))"` você
+precisa de `N/2` rodadas. Com 100.000 caracteres são 5×10^9 operações de cópia de string. É
+exatamente o caso de performance `deeplyNested`.
+
+Outro erro comum é **contar** em vez de empilhar: manter três contadores, um por tipo de colchete.
+Isso aceita `"([)]"`, que está errado — a contagem bate mas o aninhamento não.
+
+## A solução ótima
+
+```ts
+const CLOSERS = new Map([[')', '('], [']', '['], ['}', '{']]);
+const stack: string[] = [];
+
+for (const character of s) {
+  const expected = CLOSERS.get(character);
+  if (expected === undefined) {
+    stack.push(character);          // é uma abertura
+  } else if (stack.pop() !== expected) {
+    return 0;                       // fechou o que não estava aberto
+  }
+}
+return stack.length === 0 ? 1 : 0;
+```
+
+Repare que `stack.pop()` sobre pilha vazia devolve `undefined`, que nunca é igual a uma abertura —
+então o caso "fechamento sem abertura" cai no mesmo ramo, de graça.
+
+**Complexidade:** tempo `O(N)`, espaço `O(N)`.
+
+## Armadilhas
+
+- **String vazia responde 1.** Está na primeira linha da definição e é o caso mais esquecido.
+- **Sobras na pilha.** `"(("` consome sem erro e sai do laço; sem o `stack.length === 0` final você
+  devolve `1`.
+- **Fechamento com pilha vazia.** `")"` e `")("`. Se você não tratar o `pop()` de pilha vazia, `")("`
+  passa: fecha nada, abre um, e você devolve... depende de como escreveu.
+- **Contar em vez de empilhar.** `"([)]"` tem um de cada, balanceado na contagem, e é inválido.
+- **Tipos trocados no meio.** `"{[(])}"` — a pilha pega, a contagem não.
+- **`for (const c of s)` vs `s[i]`.** Para ASCII puro tanto faz; o iterador de string do JS percorre
+  *code points*, o índice percorre *code units*. Aqui o alfabeto é garantido ASCII, mas é a distinção
+  que importa em qualquer questão de string com acentos ou emoji.
+
+## O que o avaliador da Toptal está medindo aqui
+
+Se você reconhece "pilha" instantaneamente. Essa é a questão de estrutura de dados canônica, e o
+avaliador não está surpreso com a solução — ele está olhando para a **qualidade** dela: você tratou a
+pilha vazia sem um `if` extra? Você usou um mapa de pares em vez de uma cadeia de `if/else if`? Você
+lembrou de verificar a pilha no fim? Cada um desses é um ponto de acabamento, e num teste em que
+todo mundo resolve a questão, é o acabamento que ordena os candidatos.

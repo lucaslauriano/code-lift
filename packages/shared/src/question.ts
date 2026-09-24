@@ -15,6 +15,12 @@ export const testCaseSchema = z.object({
   perf: z.boolean().optional(),
   /** Per-case budget override, in milliseconds. */
   timeoutMs: z.number().int().positive().optional(),
+  /**
+   * Wall-clock a performance case may take before it counts as failed, even if the answer is right.
+   * This is what makes the performance dimension real: an O(N^2) solution returns the correct value,
+   * just far too slowly. Defaults to DEFAULT_PERF_CASE_BUDGET_MS.
+   */
+  perfBudgetMs: z.number().int().positive().optional(),
 });
 export type TestCase = z.infer<typeof testCaseSchema>;
 

@@ -1,0 +1,12 @@
+{
+  "slug": "distinct",
+  "title": "Distinct",
+  "type": "algo",
+  "difficulty": "easy",
+  "summary": "Count the number of distinct values in an array.",
+  "topics": ["sorting", "hashing", "arrays"],
+  "companies": ["toptal"],
+  "estimatedMinutes": 12,
+  "source": "toptal-style",
+  "expectedComplexity": { "time": "O(N log N)", "space": "O(N)" }
+}

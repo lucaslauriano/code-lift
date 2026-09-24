@@ -1,0 +1,60 @@
+## A ideia central
+
+Ordene e olhe apenas triplas **consecutivas**. Se existe alguma tripla triangular no array ordenado,
+existe uma adjacente — afastar os dois menores só diminui a soma deles, e puxar o maior para dentro
+só diminui o lado que precisa ser superado.
+
+## A solução ingênua
+
+Três laços aninhados testando as três desigualdades:
+
+```ts
+for (let p = 0; p < n; p++)
+  for (let q = p + 1; q < n; q++)
+    for (let r = q + 1; r < n; r++)
+      if (/* três condições */) return 1;
+```
+
+`O(N^3)`. Com `N = 100.000` isso é 10^15 iterações: não termina nem hoje nem amanhã. Mesmo a versão
+"ordena e faz dois laços" é `O(N^2)` e ainda estoura.
+
+## A solução ótima
+
+```ts
+if (a.length < 3) return 0;
+const sorted = [...a].sort((x, y) => x - y);
+
+for (let i = 0; i + 2 < sorted.length; i++) {
+  if (sorted[i] > sorted[i + 2] - sorted[i + 1]) return 1;
+}
+return 0;
+```
+
+Num array ordenado com `p <= q <= r`, duas das três desigualdades são automáticas: `q + r > p` e
+`p + r > q` valem sempre que os valores são não-negativos e ordenados. Só `p + q > r` precisa ser
+testada. E quando os valores são negativos, `r` (o maior) é maior ou igual a `p + q`, então a
+condição falha naturalmente — sem precisar de um filtro para negativos.
+
+**Complexidade:** tempo `O(N log N)` (a ordenação domina), espaço `O(N)` pela cópia.
+
+## Armadilhas
+
+- **`sort()` sem comparador.** O padrão do JavaScript ordena como string: `[10, 9, 8].sort()` devolve
+  `[10, 8, 9]`. Com negativos e valores de 10 dígitos, o resultado é lixo. **Sempre**
+  `(x, y) => x - y`.
+- **Overflow em `p + q`.** Os valores vão até `2^31 - 1`; a soma de dois deles não cabe em 32 bits.
+  Em JS não há problema (são doubles), mas escrever `p > r - q` em vez de `p + q > r` é o hábito
+  correto, e é o que o avaliador espera ver de quem já apanhou disso em outra linguagem.
+- **Triângulo degenerado.** `[1, 2, 3]` responde `0`: a desigualdade é estrita (`1 + 2 > 3` é falso).
+  Fibonacci é o gerador canônico de contraexemplos por esse motivo.
+- **Menos de três elementos.** Array vazio ou com 1–2 elementos responde `0`. Sem o guarda, o laço
+  simplesmente não roda e você devolve `0` de qualquer jeito — mas o guarda explícito documenta a
+  intenção.
+- **Mutar a entrada.** `a.sort()` ordena o array de quem chamou.
+
+## O que o avaliador da Toptal está medindo aqui
+
+A justificativa, não o código. O código são cinco linhas; o que importa é você saber **por que**
+triplas adjacentes bastam. Num pair programming da Toptal essa é a pergunta de follow-up garantida, e
+"eu vi num blog" não passa. O segundo sinal é o `p > r - q`: quem escreve assim está demonstrando que
+pensa em limites de tipo mesmo numa linguagem que não tem esse problema.

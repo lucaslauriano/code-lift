@@ -1,0 +1,12 @@
+{
+  "slug": "missing-integer",
+  "title": "Missing Integer",
+  "type": "algo",
+  "difficulty": "medium",
+  "summary": "Find the smallest positive integer that does not occur in an array.",
+  "topics": ["hashing", "arrays", "counting"],
+  "companies": ["toptal", "amazon"],
+  "estimatedMinutes": 20,
+  "source": "toptal-style",
+  "expectedComplexity": { "time": "O(N)", "space": "O(N)" }
+}

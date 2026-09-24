@@ -1,4 +1,5 @@
 import {
+  DEFAULT_PERF_CASE_BUDGET_MS,
   DEFAULT_RUN_TIMEOUT_MS,
   PERF_RUN_TIMEOUT_MS,
   type CaseResult,
@@ -90,16 +91,26 @@ async function runSingleCase(
   try {
     const received = await (fn as (...a: unknown[]) => unknown)(...args);
     const durationMs = performance.now() - startedAt;
-    const passed = deepEqual(received, testCase.expected);
+    const correct = deepEqual(received, testCase.expected);
+
+    // A performance case can be right and still fail. Without this, an O(N^2) solution returns the
+    // correct answer on a 100k input in a few seconds, lands inside the whole-run timeout, and
+    // scores full marks — which is exactly what the performance dimension exists to prevent.
+    const budgetMs = testCase.perfBudgetMs ?? DEFAULT_PERF_CASE_BUDGET_MS;
+    const tooSlow = perf && correct && durationMs > budgetMs;
+
     return {
       index,
       name,
-      status: passed ? 'passed' : 'failed',
+      status: correct && !tooSlow ? 'passed' : 'failed',
       hidden,
       perf,
-      received: passed ? null : serializeValue(received),
-      expected: passed ? null : serializeValue(testCase.expected),
-      error: null,
+      received: correct ? null : serializeValue(received),
+      expected: correct ? null : serializeValue(testCase.expected),
+      error: tooSlow
+        ? `Correct, but too slow: ${Math.round(durationMs)}ms against a ${budgetMs}ms budget. ` +
+          'Look for a nested loop or a repeated scan.'
+        : null,
       durationMs,
     };
   } catch (error) {

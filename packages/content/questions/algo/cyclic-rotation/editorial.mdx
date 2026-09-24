@@ -1,0 +1,56 @@
+## A ideia central
+
+Girar `N` vezes devolve o array ao ponto de partida, então só importa `K % N`. Com o deslocamento
+reduzido, a resposta é um mapeamento direto de índices em uma única passagem.
+
+## A solução ingênua
+
+Duas versões aparecem sempre:
+
+```ts
+// 1. gira um passo, K vezes
+for (let step = 0; step < k; step++) {
+  a.unshift(a.pop()!);
+}
+```
+
+Com `K` grande isso é `O(N * K)`. Pior: `unshift` **não** é `O(1)` — ele reindexa o array inteiro, o
+que já custa `O(N)` por passo. Nos casos de performance (N = 100.000, K = 100.000) isso são 10^10
+operações de movimentação. Não termina.
+
+A segunda versão, `a.slice(-k).concat(a.slice(0, -k))`, é `O(N)` e está quase certa — mas quebra em
+`k === 0` (`slice(-0)` é `slice(0)`, que devolve o array **inteiro**, e `slice(0, -0)` devolve
+`[]`, ou seja, o resultado sai duplicado e vazio ao mesmo tempo). É a armadilha mais cruel da questão.
+
+## A solução ótima
+
+```ts
+const shift = ((k % n) + n) % n;
+const rotated = new Array<number>(n);
+for (let i = 0; i < n; i++) {
+  rotated[(i + shift) % n] = a[i];
+}
+```
+
+Uma passagem, sem alocação intermediária além do resultado. O `((k % n) + n) % n` normaliza também
+`K` negativo, que o enunciado não pede mas custa zero.
+
+**Complexidade:** tempo `O(N)`, espaço `O(N)` para o resultado. Dá para fazer em `O(1)` de espaço
+extra com a técnica de três reversões (reverte tudo, reverte os primeiros `shift`, reverte o resto),
+mas aí você mutaria a entrada — que o enunciado proíbe.
+
+## Armadilhas
+
+- **Array vazio.** `k % 0` é `NaN`. Trate `n === 0` antes de qualquer aritmética.
+- **`K > N`.** Sem o módulo, você escreve fora do array ou entra em laço eterno.
+- **`K === 0`.** O caso que quebra a solução com `slice(-k)`.
+- **Mutar a entrada.** `a.sort()`, `a.reverse()`, `a.unshift()` alteram o array do chamador. Aqui
+  isso é penalizado; no runner do code-lift a entrada é clonada antes de cada caso, então o bug
+  passa despercebido localmente e reprova na prova real.
+
+## O que o avaliador da Toptal está medindo aqui
+
+Aritmética modular e disciplina com casos de borda. A questão é trivial no papel, e é exatamente por
+isso que ela discrimina: quem escreve `slice(-k)` sem pensar em `k = 0` perde 100% de corretude numa
+questão "fácil". O avaliador também olha se você reduziu `K` antes do laço — é o sinal mais barato de
+que você pensa em complexidade antes de digitar.

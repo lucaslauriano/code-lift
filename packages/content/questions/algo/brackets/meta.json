@@ -1,0 +1,12 @@
+{
+  "slug": "brackets",
+  "title": "Brackets",
+  "type": "algo",
+  "difficulty": "medium",
+  "summary": "Decide whether a string of three bracket kinds is properly nested.",
+  "topics": ["stacks", "strings"],
+  "companies": ["toptal", "google"],
+  "estimatedMinutes": 20,
+  "source": "toptal-style",
+  "expectedComplexity": { "time": "O(N)", "space": "O(N)" }
+}

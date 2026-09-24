@@ -1,0 +1,12 @@
+{
+  "slug": "binary-gap",
+  "title": "Binary Gap",
+  "type": "algo",
+  "difficulty": "easy",
+  "summary": "Find the longest run of zeros surrounded by ones in the binary representation of a number.",
+  "topics": ["bit-manipulation", "math"],
+  "companies": ["toptal"],
+  "estimatedMinutes": 15,
+  "source": "toptal-style",
+  "expectedComplexity": { "time": "O(log N)", "space": "O(1)" }
+}

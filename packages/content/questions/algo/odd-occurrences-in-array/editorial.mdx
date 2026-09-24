@@ -1,0 +1,52 @@
+## A ideia central
+
+`x ^ x === 0` e `x ^ 0 === x`. Como o XOR é comutativo e associativo, dobrar o array inteiro com ele
+cancela todos os pares, não importa onde os gêmeos estejam — sobra exatamente o elemento sem par.
+
+## A solução ingênua
+
+Contar ocorrências com dois laços:
+
+```ts
+for (const x of a) {
+  if (a.filter((y) => y === x).length % 2 === 1) return x;
+}
+```
+
+É `O(N^2)`. Com `N = 100.000` são 10^10 comparações: não termina dentro do tempo. A versão com
+`Map<number, number>` é `O(N)` em tempo e resolve a corretude, mas usa `O(N)` de espaço — e o
+enunciado pede `O(1)`. No Codility isso custa pontos de performance mesmo passando em todos os casos.
+
+## A solução ótima
+
+```ts
+let unpaired = 0;
+for (const value of a) unpaired ^= value;
+return unpaired;
+```
+
+Uma passagem, um acumulador. Note que a ordem do array é irrelevante: o XOR não se importa se os
+gêmeos estão adjacentes ou nas pontas opostas.
+
+**Complexidade:** tempo `O(N)`, espaço `O(1)`.
+
+## Armadilhas
+
+- **`N = 1`.** O array tem um único elemento e ele é a resposta. `0 ^ x === x` já cobre isso de
+  graça — mas uma solução baseada em `Map` com "retorne a primeira chave com contagem ímpar" precisa
+  que o laço rode pelo menos uma vez.
+- **Valores até 10^9.** Cabem em 30 bits, então o XOR de 32 bits do JavaScript é seguro aqui. Se o
+  enunciado permitisse valores acima de 2^31 você precisaria de `BigInt` — vale verificar o intervalo
+  antes de confiar em operadores bit a bit em JS, porque eles convertem para inteiro **com sinal** de
+  32 bits silenciosamente.
+- **Ordenar primeiro.** `a.sort()` e comparar pares funciona, mas é `O(N log N)` e muta a entrada.
+- **`sort()` sem comparador.** Se você for por esse caminho, lembre que o `sort` padrão do JS ordena
+  como string: `[10, 9]` vira `[10, 9]`. É a armadilha clássica.
+
+## O que o avaliador da Toptal está medindo aqui
+
+Se você reconhece uma propriedade algébrica em vez de partir para força bruta. Todo mundo resolve
+essa questão; a diferença está em **como**. Um `Map` entrega 100% de corretude e uma nota mais baixa
+de performance/espaço; o XOR entrega os dois e mostra que você sabe que existe uma solução em espaço
+constante. Também é onde o avaliador vê se você percebeu que a garantia "todos os outros aparecem um
+número **par** de vezes" (não necessariamente duas) é o que torna o XOR correto.

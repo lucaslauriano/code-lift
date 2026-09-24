@@ -1,0 +1,12 @@
+{
+  "slug": "odd-occurrences-in-array",
+  "title": "Odd Occurrences In Array",
+  "type": "algo",
+  "difficulty": "easy",
+  "summary": "Every value appears twice except one. Find the unpaired value.",
+  "topics": ["bit-manipulation", "hashing", "arrays"],
+  "companies": ["toptal", "amazon"],
+  "estimatedMinutes": 15,
+  "source": "toptal-style",
+  "expectedComplexity": { "time": "O(N)", "space": "O(1)" }
+}

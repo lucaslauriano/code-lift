@@ -1,0 +1,55 @@
+## A ideia central
+
+Um conjunto colapsa duplicatas na inserção. Jogue tudo dentro e leia o tamanho — não há lógica de
+comparação para errar.
+
+## A solução ingênua
+
+```ts
+let count = 0;
+for (let i = 0; i < a.length; i++) {
+  if (a.indexOf(a[i]) === i) count++;
+}
+```
+
+Elegante e `O(N^2)`: cada `indexOf` varre o array de novo. Com `N = 100.000` são 5×10^9 comparações.
+Não termina. O mesmo vale para o padrão `seen: number[]` com `seen.includes(x)`.
+
+## A solução ótima
+
+```ts
+return new Set(a).size;
+```
+
+`O(N)` em média, `O(N)` de espaço. O enunciado pede `O(N log N)`, que é o limite da abordagem
+"ordena e conta transições":
+
+```ts
+const sorted = [...a].sort((x, y) => x - y);
+let count = 0;
+for (let i = 0; i < sorted.length; i++) {
+  if (i === 0 || sorted[i] !== sorted[i - 1]) count++;
+}
+```
+
+Essa segunda versão é a que você quer ter na ponta da língua se a pergunta vier com restrição de
+espaço `O(1)` extra (ordenando in-place). Aqui, o `Set` é estritamente melhor.
+
+## Armadilhas
+
+- **Array vazio.** Resposta `0`, não `1`. A versão com `sort` e "conta transições" precisa do guarda
+  `i === 0` dentro do laço — se você inicializar `count = 1` fora, o caso vazio devolve `1`.
+- **`sort()` sem comparador.** `[10, 9].sort()` devolve `[10, 9]`, porque o padrão compara como
+  string. Com números negativos fica pior. Sempre `(x, y) => x - y`.
+- **Mutar a entrada.** `a.sort()` ordena o array do chamador. Use `[...a].sort()`.
+- **`-0` e `0`.** `Set` os trata como o mesmo valor (usa SameValueZero), que é o comportamento
+  correto aqui. Um `Map` com chave numérica faz o mesmo. Vale saber que `Object.is(0, -0)` é `false`
+  mas `new Set([0, -0]).size` é `1`.
+
+## O que o avaliador da Toptal está medindo aqui
+
+Se você conhece as estruturas de dados da linguagem e alcança a certa de primeira. Essa questão dura
+90 segundos para quem sabe e 10 minutos para quem começa a ordenar na mão — e num teste de 90
+minutos com três questões, esses 8 minutos são a diferença entre terminar a difícil e não terminar.
+O avaliador também checa se você não mutou a entrada: é o tipo de efeito colateral que, num código de
+produção, vira bug em outro lugar.

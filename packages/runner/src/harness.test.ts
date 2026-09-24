@@ -47,3 +47,41 @@ describe('runCases', () => {
     expect(outcome.status).toBe('passed');
   });
 });
+
+describe('performance budget', () => {
+  const slowButCorrect = ((n: number) => {
+    const until = performance.now() + 60;
+    while (performance.now() < until) {
+      /* burn wall-clock the way a quadratic solution would */
+    }
+    return n;
+  }) as never;
+
+  it('fails a performance case that is correct but over budget', async () => {
+    const outcome = await runCases({
+      fn: slowButCorrect,
+      cases: [{ input: [1], expected: 1, perf: true, perfBudgetMs: 10 }],
+    });
+
+    expect(outcome.status).toBe('failed');
+    expect(outcome.cases[0]?.error).toContain('too slow');
+    // The answer was right, so there is nothing to show in the diff columns.
+    expect(outcome.cases[0]?.received).toBeNull();
+  });
+
+  it('leaves a non-performance case alone no matter how slow it is', async () => {
+    const outcome = await runCases({
+      fn: slowButCorrect,
+      cases: [{ input: [1], expected: 1, perfBudgetMs: 10 }],
+    });
+    expect(outcome.status).toBe('passed');
+  });
+
+  it('passes a performance case that stays inside its budget', async () => {
+    const outcome = await runCases({
+      fn: ((n: number) => n) as never,
+      cases: [{ input: [1], expected: 1, perf: true, perfBudgetMs: 1_000 }],
+    });
+    expect(outcome.status).toBe('passed');
+  });
+});

@@ -44,3 +44,13 @@ export type RunResult = z.infer<typeof runResultSchema>;
 
 export const DEFAULT_RUN_TIMEOUT_MS = 5_000;
 export const PERF_RUN_TIMEOUT_MS = 10_000;
+
+/**
+ * Default wall-clock budget for a single performance case.
+ *
+ * Calibrated against the seed questions: the optimal solutions finish a 100k case in single-digit
+ * milliseconds, while the naive ones take 1.5-4s per case. Two seconds sits three orders of
+ * magnitude above the former and well below the latter, so it survives a slow laptop without ever
+ * letting a quadratic solution through.
+ */
+export const DEFAULT_PERF_CASE_BUDGET_MS = 2_000;

@@ -1,0 +1,43 @@
+{
+  "name": "@code-lift/content",
+  "version": "0.1.0",
+  "private": true,
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist",
+    "questions",
+    "quiz",
+    "flashcards"
+  ],
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "dev": "tsc -p tsconfig.json --watch --preserveWatchOutput",
+    "typecheck": "tsc -p tsconfig.json --noEmit && tsc -p tsconfig.questions.json",
+    "lint": "eslint .",
+    "test": "vitest run",
+    "validate": "tsx scripts/validate.ts",
+    "sync": "tsx scripts/sync.ts"
+  },
+  "dependencies": {
+    "@code-lift/runner": "workspace:*",
+    "@code-lift/shared": "workspace:*",
+    "zod": "catalog:"
+  },
+  "devDependencies": {
+    "@code-lift/config": "workspace:*",
+    "@code-lift/db": "workspace:*",
+    "@types/node": "catalog:",
+    "dotenv": "^18.0.3",
+    "eslint": "catalog:",
+    "tsx": "catalog:",
+    "typescript": "catalog:",
+    "vitest": "catalog:"
+  }
+}

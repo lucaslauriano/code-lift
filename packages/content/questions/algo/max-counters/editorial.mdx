@@ -1,0 +1,70 @@
+## A ideia central
+
+Nunca execute o "max counter". Guarde apenas o **piso** que ele estabeleceu e aplique esse piso
+preguiçosamente: um contador que não foi tocado desde então vale o piso, não o número velho que
+ainda está guardado nele.
+
+## A solução ingênua
+
+```ts
+if (operation === n + 1) {
+  counters.fill(Math.max(...counters));   // O(N)
+}
+```
+
+Cada "max counter" escreve nos `N` contadores. No caso em que metade das `M` operações é um max
+counter, isso é `O(N * M)` — com ambos em 100.000, são 5×10^9 escritas. É o caso de performance
+`alternating` desta questão, e ele existe precisamente para reprovar essa solução. (O
+`Math.max(...counters)` ainda por cima estoura a pilha de argumentos com 100k elementos.)
+
+## A solução ótima
+
+Duas variáveis carregam todo o trabalho:
+
+- `floor` — o valor que o último "max counter" garantiu para todo mundo.
+- `peak` — o máximo corrente, que é o que o **próximo** "max counter" vai virar piso.
+
+```ts
+for (const operation of a) {
+  if (operation === n + 1) {
+    floor = peak;          // O(1): só anota, não escreve
+    continue;
+  }
+  const i = operation - 1;
+  const next = Math.max(counters[i], floor) + 1;
+  counters[i] = next;
+  if (next > peak) peak = next;
+}
+
+// quem nunca foi tocado depois do último level-up ainda está desatualizado
+for (let i = 0; i < n; i++) {
+  if (counters[i] < floor) counters[i] = floor;
+}
+```
+
+O `Math.max(counters[i], floor)` é o coração: ele "materializa" o piso no momento exato em que
+aquele contador volta a importar.
+
+**Complexidade:** tempo `O(N + M)`, espaço `O(N)`.
+
+## Armadilhas
+
+- **Esquecer a passagem final.** Sem ela, todo contador que não recebeu increase depois do último
+  max counter fica com o valor antigo. É o erro que faz passar nos casos pequenos e falhar nos
+  grandes.
+- **Confundir `floor` com `peak`.** `floor = peak` acontece **no** max counter. Se você fizer
+  `floor = Math.max(floor, counters[i])` dentro do increase, perde a semântica.
+- **`Math.max(...array)` com 100k elementos.** Estoura o limite de argumentos da engine
+  (`RangeError: Maximum call stack size exceeded`). Mantenha o máximo incremental.
+- **Operação `N + 1` quando `N = 1`.** Aí `A[K] = 2` é max counter e `A[K] = 1` é increase. Fácil de
+  inverter.
+- **Max counter no início ou repetido.** `[4, 4]` com tudo zerado deve continuar zerado — `peak`
+  começa em `0` e `floor = 0` cobre isso naturalmente.
+
+## O que o avaliador da Toptal está medindo aqui
+
+Esta é a questão que mais reprova candidatos experientes, porque a solução ingênua é **correta** —
+ela só é lenta. O avaliador está medindo se você reconhece o padrão "operação em lote que pode ser
+adiada" e se você consegue manter dois invariantes simultâneos (`floor` e `peak`) sem se enrolar. Em
+código de produção esse é exatamente o raciocínio por trás de dirty flags, de invalidação lazy de
+cache e de versionamento por época — por isso ela aparece tanto.
