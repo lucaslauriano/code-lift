@@ -217,7 +217,7 @@ export function Workspace({
             active={store.leftTab}
             onSelect={(id) => store.setLeftTab(id as LeftTab)}
           />
-          <div className="min-h-0 flex-1 overflow-y-auto px-5 py-4">
+          <div className="relative min-h-0 flex-1 overflow-y-auto px-5 py-4">
             {store.leftTab === 'description' ? promptNode : null}
             {store.leftTab === 'solution' && solutionSource ? (
               <pre className="overflow-x-auto rounded-md border border-[var(--border)] bg-[var(--muted)] p-3 font-mono text-xs">
@@ -263,7 +263,7 @@ export function Workspace({
                 active={store.bottomTab}
                 onSelect={(id) => store.setBottomTab(id as BottomTab)}
               />
-              <div className="min-h-0 flex-1 overflow-y-auto">
+              <div className="relative min-h-0 flex-1 overflow-y-auto">
                 {store.bottomTab === 'cases' ? (
                   <CasesPanel
                     publicCases={detail.publicCases}

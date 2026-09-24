@@ -104,7 +104,9 @@ export function QuestionList(): React.ReactElement {
         filters={filters}
         onChange={setFilters}
         facets={facetsOf(catalogue.data?.questions ?? [])}
-        className="order-1 w-full shrink-0 lg:order-2 lg:w-64"
+        // Sticky on wide screens: with dozens of questions the panel would otherwise scroll away and
+        // leave no way to change filters without going back to the top.
+        className="order-1 w-full shrink-0 lg:sticky lg:top-6 lg:order-2 lg:w-64"
       />
     </div>
   );

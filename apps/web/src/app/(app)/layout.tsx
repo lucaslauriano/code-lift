@@ -34,7 +34,13 @@ export default async function AppLayout({
         <aside className="hidden border-r border-[var(--border)] md:block">
           <AppSidebar />
         </aside>
-        <main className="min-w-0 flex-1 overflow-y-auto">{children}</main>
+        {/*
+          `relative` is load-bearing, not decoration. `overflow` alone does not create a
+          containing block, so an absolutely positioned descendant — every `sr-only` label, for
+          one — anchors to the document instead and stretches it, which makes the whole page
+          scroll and drags the header and sidebar out of view.
+        */}
+        <main className="relative min-w-0 flex-1 overflow-y-auto">{children}</main>
       </div>
     </div>
   );

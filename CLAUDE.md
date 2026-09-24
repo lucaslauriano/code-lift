@@ -64,6 +64,9 @@ pnpm test:e2e
 - **O model do Monaco existe antes de o React ligar o listener de mudança.** Um `setValue`
   programático nessa janela atualiza o editor e mais nada — a tela fica certa e o run executa o
   starter. O helper `setEditorValue` nos testes reescreve até o rascunho persistido bater.
+- **Todo container de scroll precisa de `relative`.** `overflow` sozinho **não** cria bloco de
+  contenção, então qualquer descendente `absolute` — todo `sr-only`, por exemplo — se ancora no
+  documento e o estica. A página inteira passa a rolar e o header e a sidebar somem junto.
 - **`structuredClone` estoura em ~2000 de profundidade** — antes da recursão comum (~6000), ou seja,
   o harness era o limite mais apertado. `packages/runner/src/clone.ts` cai para um clone iterativo
   quando isso acontece, então listas e árvores degeneradas de 100k funcionam.

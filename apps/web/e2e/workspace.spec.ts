@@ -132,3 +132,37 @@ test.describe('the workspace', () => {
     await expect(page.getByText('7 / 7 passed')).toBeVisible();
   });
 });
+
+test.describe('layout', () => {
+  /**
+   * `overflow` does not create a containing block, so an absolutely positioned descendant of a
+   * scroll container — every `sr-only` label, for one — anchors to the document and stretches it.
+   * The page then scrolls as a whole and the header and sidebar slide away. Each scroll container
+   * is `relative` to prevent that, and this is the check that keeps it so.
+   */
+  for (const path of ['/questions', '/dashboard', '/mock', '/questions/xml-tags']) {
+    test(`the document itself never scrolls on ${path}`, async ({ page }) => {
+      await page.goto(path);
+      await expect(page.getByRole('link', { name: 'code-lift' })).toBeVisible();
+
+      const overflow = await page.evaluate(
+        () => document.scrollingElement!.scrollHeight - window.innerHeight,
+      );
+      expect(overflow).toBeLessThanOrEqual(1);
+    });
+  }
+
+  test('the header and sidebar stay put when the list is scrolled to the bottom', async ({
+    page,
+  }) => {
+    await page.goto('/questions');
+    await expect(page.getByText('39 questions')).toBeVisible();
+
+    await page.locator('main').evaluate((main) => main.scrollTo(0, main.scrollHeight));
+
+    await expect(page.getByRole('link', { name: 'code-lift' })).toBeInViewport();
+    await expect(page.getByRole('navigation', { name: 'Main' })).toBeInViewport();
+    // The filter panel is sticky, so it is still reachable without scrolling back up.
+    await expect(page.getByRole('heading', { name: 'Filters' })).toBeInViewport();
+  });
+});

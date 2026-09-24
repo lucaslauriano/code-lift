@@ -54,7 +54,10 @@ export function AppSidebar(): React.ReactElement {
   const pathname = usePathname();
 
   return (
-    <nav aria-label="Main" className="flex h-full w-60 shrink-0 flex-col gap-6 overflow-y-auto p-3">
+    <nav
+      aria-label="Main"
+      className="relative flex h-full w-60 shrink-0 flex-col gap-6 overflow-y-auto p-3"
+    >
       {GROUPS.map((group) => (
         <div key={group.title}>
           <h2 className="px-3 pb-2 text-xs font-medium tracking-wide text-[var(--muted-foreground)] uppercase">
