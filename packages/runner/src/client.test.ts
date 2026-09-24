@@ -104,6 +104,22 @@ describe('runInWorker', () => {
     expect(FakeWorker.latest?.terminated).toBe(true);
   });
 
+  it('explains a timeout on a performance case in terms of complexity', async () => {
+    FakeWorker.script = () => {
+      // Never reports back: the classic quadratic solution on a 100k input.
+    };
+
+    const result = await runInWorker({
+      code: 'x',
+      language: 'typescript',
+      cases: [{ name: '100k', input: [1], expected: 1, perf: true }],
+      timeoutMs: 20,
+    });
+
+    expect(result.cases[0]?.status).toBe('timeout');
+    expect(result.cases[0]?.error).toContain('quadratic');
+  });
+
   it('reports a compile error without inventing case results', async () => {
     FakeWorker.script = (worker) => {
       worker.emit({ type: 'compile-error', message: 'Unexpected token' });

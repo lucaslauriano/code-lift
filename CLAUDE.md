@@ -43,6 +43,10 @@ pnpm test:e2e
 | Auth                  | `apps/api/src/auth/` — guard global, `@Public()` é a exceção                   |
 | Shell do web          | `apps/web/src/app/(app)/layout.tsx`                                            |
 | Cliente da API        | `apps/web/src/lib/api.ts` (browser) e `server-api.ts` (RSC)                    |
+| Hooks de dados        | `apps/web/src/lib/queries.ts` (TanStack Query)                                 |
+| Workspace             | `apps/web/src/components/workspace/` — `workspace.tsx` orquestra run/submit    |
+| Estado do workspace   | `apps/web/src/lib/workspace-store.ts` (zustand, efêmero)                       |
+| E2E de navegador      | `apps/web/e2e/` (`pnpm test:e2e`, exige os servidores no ar)                   |
 | ADRs                  | `docs/adr/`                                                                    |
 
 ## Armadilhas já pagas
@@ -57,5 +61,10 @@ pnpm test:e2e
 - **Vitest precisa do transform SWC na API.** esbuild não emite metadata de decorator.
 - **`@nestjs/cli` quebra no Node 22** (ciclo ESM numa dependência dele). Build é `tsc` direto.
 - **Portas:** 3010 (web), 3334 (api), 5434 (postgres). As padrão estavam ocupadas nesta máquina.
+- **O model do Monaco existe antes de o React ligar o listener de mudança.** Um `setValue`
+  programático nessa janela atualiza o editor e mais nada — a tela fica certa e o run executa o
+  starter. O helper `setEditorValue` nos testes reescreve até o rascunho persistido bater.
+- **Casos ocultos são ~800 kB** (dois inputs de 100k). Só são buscados no Submit e ficam em cache
+  com `staleTime: Infinity`.
 - **`API_INTERNAL_URL` ≠ `NEXT_PUBLIC_API_URL`.** O bundle do browser precisa do endereço visível do
   host; o servidor Next dentro do compose alcança a API pelo nome do serviço.

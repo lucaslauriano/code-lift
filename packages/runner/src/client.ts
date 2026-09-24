@@ -121,7 +121,14 @@ function collect(
       perf: testCase.perf === true,
       received: null,
       expected: null,
-      error: timedOut ? 'Timed out — the run was stopped before this case finished.' : 'Never ran.',
+      error: !timedOut
+        ? 'Never ran.'
+        : testCase.perf === true
+          ? // A performance case that never returns is the signature of a solution one complexity
+            // class too slow, and saying so is more useful than a bare timeout.
+            'Timed out on a large input. A correct but quadratic solution looks exactly like this — ' +
+            'look for a nested loop or a scan repeated per element.'
+          : 'Timed out — the run was stopped before this case finished.',
       durationMs: 0,
     };
   });
