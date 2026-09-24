@@ -1,0 +1,47 @@
+## A ideia central
+
+É o mesmo flood fill de contar ilhas, só que cada preenchimento devolve quantas células consumiu, e
+você fica com o maior.
+
+## A diferença em relação à versão recursiva
+
+Recursivamente a área sai de graça:
+
+```ts
+function area(r, c) {
+  if (fora(r, c) || grid[r][c] !== 1) return 0;
+  grid[r][c] = 0;
+  return 1 + area(r + 1, c) + area(r - 1, c) + area(r, c + 1) + area(r, c - 1);
+}
+```
+
+Com pilha explícita não há valor de retorno para somar — você conta ao desempilhar:
+
+```ts
+let area = 0;
+while (stack.length > 0) {
+  const cell = stack.pop()!;
+  area += 1;
+  // ... empilha vizinhos de terra, marcando na hora
+}
+```
+
+E é preciso usar a pilha: uma grade 300×300 sólida é uma região de 90.000 células, e a recursão vai
+fundo demais.
+
+**Complexidade:** tempo `O(R × C)`, espaço `O(R × C)`.
+
+## Armadilhas
+
+- **Marcar ao desempilhar.** Se você só marca quando tira da pilha, a mesma célula entra várias
+  vezes (uma por vizinho) e a área sai **maior** que a real. Marque ao empilhar.
+- **Grade sem terra devolve `0`**, não `-Infinity` de um `Math.max` sobre lista vazia.
+- **Diagonais.** O tabuleiro de damas tem ilha máxima de tamanho 1.
+- **Recursão.** É o caso de performance.
+
+## O que o avaliador está medindo aqui
+
+É a continuação natural de "número de ilhas", e a pergunta é se você adapta o padrão em vez de
+reescrever. O detalhe que pega gente é a contagem dupla ao marcar tarde — é um bug que **aumenta** a
+resposta, então passa despercebido em grades pequenas onde você conferiu de olho e some só quando as
+regiões ficam grandes.

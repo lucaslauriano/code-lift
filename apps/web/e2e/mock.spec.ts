@@ -1,3 +1,4 @@
+import type { Page } from '@playwright/test';
 import { expect, setEditorValue, test } from './fixtures';
 
 const API_URL = process.env['NEXT_PUBLIC_API_URL'] ?? 'http://localhost:3334';
@@ -57,30 +58,36 @@ test.describe('mock sessions', () => {
   });
 
   test('scores a question solved inside the session', async ({ page }) => {
+    // The preset shuffles, so which questions come up is not known in advance. Collect every
+    // Codility-track reference solution first — while the editorials are still unlocked — and look
+    // up whichever one the draw produces.
+    const solutions = await referenceSolutions(page);
+
     await page.goto('/mock');
     await page.getByRole('button', { name: /Start mock test/ }).click();
     await expect(page.getByRole('heading', { name: 'Mock in progress' })).toBeVisible();
 
-    // Work out which question came up, then solve it with its own reference solution.
     const firstQuestion = page.getByRole('link', { name: /^\d/ }).first();
     const href = (await firstQuestion.getAttribute('href')) ?? '';
     const slug = href.split('/').pop() ?? '';
 
-    const editorialLocked = await page.request.get(`${API_URL}/questions/${slug}/editorial`);
-    expect(editorialLocked.status()).toBe(403);
+    const solution = solutions.get(slug);
+    expect(solution, `no reference solution collected for ${slug}`).toBeDefined();
+
+    // The editorial is locked now that the session covers this question.
+    const locked = await page.request.get(`${API_URL}/questions/${slug}/editorial`);
+    expect(locked.status()).toBe(403);
 
     await page.goto(href);
-    await setEditorValue(page, REFERENCE_SOLUTIONS[slug] ?? 'export function solution() {}');
+    await setEditorValue(page, solution as string);
     await page.keyboard.press('ControlOrMeta+Shift+Enter');
-    await expect(page.getByText(/\d+ \/ \d+ passed/)).toBeVisible({ timeout: 30_000 });
+    await expect(page.getByText(/^(\d+) \/ \1 passed$/)).toBeVisible({ timeout: 45_000 });
 
     await page.goto('/mock');
     await page.getByRole('link', { name: 'Resume session' }).click();
     await page.getByRole('button', { name: 'Finish now' }).click();
 
     await expect(page.getByRole('heading', { name: 'Mock result' })).toBeVisible();
-    const row = page.locator('li', { hasText: slug === '' ? 'x' : /./ });
-    await expect(row.first()).toBeVisible();
     // One of three solved perfectly averages to 33.
     await expect(page.getByText('33/100')).toBeVisible();
   });
@@ -114,84 +121,21 @@ test.describe('the dashboard', () => {
 });
 
 /**
- * Reference solutions for the questions the preset can draw, so the test can actually solve one.
- * Kept here rather than read from packages/content: the point is to exercise the browser path.
+ * Every Codility-track reference solution, keyed by slug.
+ *
+ * Read from the API rather than duplicated here, so adding a question to the catalogue never
+ * silently makes this test fall back to a stub and assert the wrong score.
  */
-const REFERENCE_SOLUTIONS: Record<string, string> = {
-  'binary-gap': `export function solution(n: number): number {
-    let longest = 0, current = 0, seenOne = false, rest = n;
-    while (rest > 0) {
-      const bit = rest & 1; rest >>>= 1;
-      if (bit === 1) { if (seenOne && current > longest) longest = current; seenOne = true; current = 0; }
-      else if (seenOne) current += 1;
-    }
-    return longest;
-  }`,
-  'cyclic-rotation': `export function solution(a: number[], k: number): number[] {
-    const n = a.length;
-    if (n === 0) return [];
-    const shift = ((k % n) + n) % n;
-    const out = new Array<number>(n);
-    for (let i = 0; i < n; i += 1) out[(i + shift) % n] = a[i] as number;
-    return out;
-  }`,
-  distinct: `export function solution(a: number[]): number { return new Set(a).size; }`,
-  'odd-occurrences-in-array': `export function solution(a: number[]): number {
-    let u = 0; for (const v of a) u ^= v; return u;
-  }`,
-  brackets: `export function solution(s: string): number {
-    const closers = new Map([[')', '('], [']', '['], ['}', '{']]);
-    const stack: string[] = [];
-    for (const c of s) {
-      const want = closers.get(c);
-      if (want === undefined) stack.push(c);
-      else if (stack.pop() !== want) return 0;
-    }
-    return stack.length === 0 ? 1 : 0;
-  }`,
-  'frog-river-one': `export function solution(x: number, a: number[]): number {
-    const covered = new Uint8Array(x + 1);
-    let remaining = x;
-    for (let t = 0; t < a.length; t += 1) {
-      const p = a[t] as number;
-      if (p >= 1 && p <= x && covered[p] === 0) { covered[p] = 1; remaining -= 1; if (remaining === 0) return t; }
-    }
-    return -1;
-  }`,
-  'max-counters': `export function solution(n: number, a: number[]): number[] {
-    const c = new Array<number>(n).fill(0);
-    let floor = 0, peak = 0;
-    for (const op of a) {
-      if (op === n + 1) { floor = peak; continue; }
-      const i = op - 1;
-      const next = Math.max(c[i] as number, floor) + 1;
-      c[i] = next;
-      if (next > peak) peak = next;
-    }
-    for (let i = 0; i < n; i += 1) if ((c[i] as number) < floor) c[i] = floor;
-    return c;
-  }`,
-  'missing-integer': `export function solution(a: number[]): number {
-    const n = a.length;
-    const seen = new Uint8Array(n + 2);
-    for (const v of a) if (v >= 1 && v <= n) seen[v] = 1;
-    for (let k = 1; k <= n + 1; k += 1) if (seen[k] === 0) return k;
-    return n + 1;
-  }`,
-  'passing-cars': `export function solution(a: number[]): number {
-    let east = 0, pairs = 0;
-    for (const car of a) {
-      if (car === 0) east += 1;
-      else { pairs += east; if (pairs > 1000000000) return -1; }
-    }
-    return pairs;
-  }`,
-  triangle: `export function solution(a: number[]): number {
-    if (a.length < 3) return 0;
-    const s = [...a].sort((x, y) => x - y);
-    for (let i = 0; i + 2 < s.length; i += 1) {
-      if ((s[i] as number) > (s[i + 2] as number) - (s[i + 1] as number)) return 1;
-    }
-    return 0;
-  }`,
-};
+async function referenceSolutions(page: Page): Promise<Map<string, string>> {
+  const list = await page.request.get(`${API_URL}/questions?track=codility`);
+  const { questions } = (await list.json()) as { questions: { slug: string }[] };
+
+  const solutions = new Map<string, string>();
+  for (const { slug } of questions) {
+    const response = await page.request.get(`${API_URL}/questions/${slug}/editorial`);
+    if (!response.ok()) continue;
+    const { solution } = (await response.json()) as { solution: string };
+    solutions.set(slug, solution);
+  }
+  return solutions;
+}

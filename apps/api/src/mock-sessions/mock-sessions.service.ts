@@ -116,8 +116,8 @@ export class MockSessionsService {
   /**
    * One easy, one medium, one hard, from three different topics, preferring unsolved questions.
    *
-   * The catalogue may not contain every difficulty — it currently has no hard questions — so each
-   * step falls back rather than failing: a mock with three mediums is still a useful mock.
+   * The catalogue may not contain every difficulty, so each step falls back rather than failing: a
+   * mock with three mediums is still a useful mock.
    */
   private async pickPresetSlugs(userId: string): Promise<string[]> {
     const solved = new Set(
@@ -138,7 +138,11 @@ export class MockSessionsService {
 
     const unsolved = pool.filter((meta) => !solved.has(meta.slug));
     // Everything solved already? Then revising is better than refusing to start.
-    const candidates = unsolved.length >= TOPTAL_CODILITY_PRESET.questionCount ? unsolved : pool;
+    const eligible = unsolved.length >= TOPTAL_CODILITY_PRESET.questionCount ? unsolved : pool;
+
+    // Shuffled, or the picker is deterministic and every mock draws the same three questions —
+    // which defeats the point of a rehearsal you are meant to repeat.
+    const candidates = shuffle(eligible);
 
     const chosen: typeof candidates = [];
     const usedTopics = new Set<string>();
@@ -274,4 +278,16 @@ export class MockSessionsService {
       results,
     };
   }
+}
+
+/** Fisher-Yates, on a copy. */
+function shuffle<T>(items: readonly T[]): T[] {
+  const copy = [...items];
+  for (let i = copy.length - 1; i > 0; i -= 1) {
+    const j = Math.floor(Math.random() * (i + 1));
+    const swap = copy[i] as T;
+    copy[i] = copy[j] as T;
+    copy[j] = swap;
+  }
+  return copy;
 }

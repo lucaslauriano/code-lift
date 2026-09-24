@@ -1,0 +1,19 @@
+An undirected graph has `n` nodes numbered `0` to `n - 1`, connected by the pairs in `edges`.
+
+Return the number of connected components.
+
+## Examples
+
+| n   | edges                          | answer |
+| --- | ------------------------------ | ------ |
+| `5` | `[[0,1], [1,2], [3,4]]`        | `2`    |
+| `5` | `[[0,1], [1,2], [2,3], [3,4]]` | `1`    |
+| `4` | `[]`                           | `4`    |
+
+A node with no edges is its own component, which is why the third row is `4`.
+
+## Assumptions
+
+- `n` is within the range `[1 .. 100,000]`.
+- `edges` holds at most `100,000` pairs, each one `[a, b]` with `a !== b`.
+- Edges are undirected and may repeat.

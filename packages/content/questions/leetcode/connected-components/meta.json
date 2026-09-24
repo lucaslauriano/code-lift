@@ -1,0 +1,13 @@
+{
+  "slug": "connected-components",
+  "title": "Number of Connected Components",
+  "type": "algo",
+  "difficulty": "medium",
+  "summary": "Count the connected components of an undirected graph.",
+  "topics": ["graphs", "counting"],
+  "companies": ["amazon", "google"],
+  "estimatedMinutes": 25,
+  "source": "LeetCode 323",
+  "track": "leetcode",
+  "expectedComplexity": { "time": "O(V + E)", "space": "O(V)" }
+}

@@ -1,0 +1,49 @@
+## A ideia central
+
+A pergunta não é sobre cursos: é **"esse grafo dirigido tem ciclo?"**. Todo grafo de pré-requisitos
+sem ciclo admite alguma ordem; todo ciclo torna a ordem impossível.
+
+## A solução de Kahn
+
+Pegue repetidamente um curso sem pendências e risque-o dos dependentes. Se no fim sobrou alguém, os
+que sobraram estão se esperando.
+
+```ts
+// 1. grau de entrada = quantos pré-requisitos cada curso ainda tem
+// 2. fila com todos que já têm zero
+// 3. ao tirar um da fila, decremente os dependentes; quem zerar entra na fila
+// 4. deu para tirar todos? então não há ciclo
+return taken === numCourses;
+```
+
+**Complexidade:** tempo `O(V + E)`, espaço `O(V + E)`.
+
+## A alternativa e por que não usei
+
+DFS com três cores (branco/cinza/preto) detecta ciclo encontrando uma aresta de volta para um nó
+cinza. É igualmente correta e mais curta. Mas ela é naturalmente recursiva, e uma cadeia de 100.000
+cursos são 100.000 quadros de pilha — o caso de performance derruba. Escrita iterativamente, a DFS
+fica mais longa que Kahn.
+
+## Detalhe de desempenho
+
+Montar a adjacência como `Array.from({length: n}, () => [])` aloca 100.000 arrays pequenos. A
+solução usa arrays tipados achatados com um vetor de deslocamentos (o mesmo formato CSR de
+bibliotecas de grafos): uma alocação só. Passa das duas formas; a diferença aparece no relógio.
+
+## Armadilhas
+
+- **Direção da aresta.** `[a, b]` significa "b antes de a". Inverter troca o grau de entrada pelo de
+  saída e a resposta sai errada em grafos assimétricos.
+- **Auto-dependência.** `[[0, 0]]` é ciclo. O grau de entrada do 0 nunca zera.
+- **Arestas duplicadas.** `[[1,0],[1,0]]` não é ciclo, mas incrementa o grau de entrada duas vezes —
+  e a solução continua correta porque decrementa duas vezes também. Uma implementação que
+  "deduplica" com `Set` também funciona; uma que decrementa só uma vez trava.
+- **Recursão.**
+
+## O que o avaliador está medindo aqui
+
+Se você traduz o enunciado para o problema de grafo em vez de simular horários. Reconhecer "ordenação
+topológica" é metade; a outra metade é saber que a detecção de ciclo é o que se pergunta, e que a
+ordem em si não é pedida. A pergunta seguinte é sempre a Course Schedule II, que pede a ordem — e aí
+a fila de Kahn já é a resposta pronta.

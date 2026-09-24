@@ -1,0 +1,55 @@
+## A ideia central
+
+Caminhe nas duas listas ao mesmo tempo, sempre pegando a menor das duas cabeças. No fim, a lista que
+sobrou já está ordenada e já está ligada — anexe de uma vez.
+
+## O nó fantasma
+
+```ts
+const dummy = { val: 0, next: null };
+let tail = dummy;
+// ... sempre tail.next = algo; tail = tail.next;
+return dummy.next;
+```
+
+Sem ele, cada anexação precisa perguntar "esse é o primeiro?" para decidir entre definir a cabeça e
+estender a cauda. Com ele, só existe cauda. É um nó desperdiçado em troca de um ramo a menos em
+todas as linhas — e é o padrão que aparece em quase toda questão de lista ligada que **constrói**
+uma saída.
+
+## A solução ótima
+
+```ts
+while (a !== null && b !== null) {
+  if (a.val <= b.val) {
+    tail.next = a;
+    a = a.next;
+  } else {
+    tail.next = b;
+    b = b.next;
+  }
+  tail = tail.next;
+}
+tail.next = a !== null ? a : b; // o resto já está pronto
+return dummy.next;
+```
+
+**Complexidade:** tempo `O(N + M)`, espaço `O(1)`.
+
+## Armadilhas
+
+- **Copiar o rabo nó a nó.** Funciona e é desnecessário: a lista restante já está ordenada e ligada.
+- **`<` em vez de `<=`.** Com valores iguais, `<` pega sempre da segunda lista. O resultado continua
+  ordenado, então os testes passam — mas o merge deixa de ser **estável**, e num merge sort isso
+  importa.
+- **Esquecer de anexar o resto.** O laço termina quando uma lista acaba; a outra ainda tem nós.
+- **Alocar nós novos.** Passa nos testes, e responde a pergunta errada: o exercício é sobre religar
+  ponteiros com espaço constante.
+- **Percorrer até a cauda para anexar.** `O(N^2)`.
+
+## O que o avaliador está medindo aqui
+
+O nó fantasma e a percepção de que o resto se anexa inteiro. As duas coisas são pequenas e as duas
+aparecem em toda questão de lista. É também o passo de combinação do merge sort, então a pergunta
+seguinte costuma ser "e para k listas?" — a resposta é um heap de tamanho k, ou merge dois a dois em
+árvore.

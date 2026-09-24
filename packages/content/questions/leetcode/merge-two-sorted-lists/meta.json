@@ -1,0 +1,13 @@
+{
+  "slug": "merge-two-sorted-lists",
+  "title": "Merge Two Sorted Lists",
+  "type": "algo",
+  "difficulty": "easy",
+  "summary": "Splice two sorted linked lists into one sorted list.",
+  "topics": ["linked-lists", "two-pointers"],
+  "companies": ["amazon", "apple", "microsoft"],
+  "estimatedMinutes": 15,
+  "source": "LeetCode 21",
+  "track": "leetcode",
+  "expectedComplexity": { "time": "O(N + M)", "space": "O(1)" }
+}

@@ -1,0 +1,14 @@
+{
+  "slug": "unique-paths",
+  "title": "Unique Paths",
+  "type": "algo",
+  "difficulty": "medium",
+  "summary": "Count the paths across a grid moving only right and down.",
+  "topics": ["dynamic-programming", "math", "matrix"],
+  "companies": ["amazon", "google", "meta"],
+  "estimatedMinutes": 20,
+  "source": "LeetCode 62",
+  "track": "leetcode",
+  "performanceExemption": "The problem caps the grid at 100x100 so the answer stays inside a 32-bit integer. At that size every reasonable solution finishes instantly, so no runnable case separates them.",
+  "expectedComplexity": { "time": "O(M * N)", "space": "O(N)" }
+}

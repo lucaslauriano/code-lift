@@ -4,13 +4,15 @@ import Link from 'next/link';
 import { useMemo, useState } from 'react';
 import { Bookmark, Check, Circle, CircleDashed, MinusCircle, Search } from 'lucide-react';
 import {
-  companySchema,
   difficultySchema,
   progressStatusSchema,
-  topicSchema,
+  trackSchema,
   type ListQuestionsQuery,
+  type Company,
   type ProgressStatus,
   type QuestionSummary,
+  type Topic,
+  type Track,
 } from '@code-lift/shared';
 import { Badge } from '@code-lift/ui/badge';
 import { Card } from '@code-lift/ui/card';
@@ -23,6 +25,12 @@ const STATUS_ICON: Record<ProgressStatus, React.ComponentType<{ className?: stri
   in_progress: CircleDashed,
   done: Check,
   skipped: MinusCircle,
+};
+
+/** The Codility track is what a Toptal mock draws from; LeetCode is the wider practice set. */
+const TRACK_LABEL: Record<Track, string> = {
+  codility: 'Codility',
+  leetcode: 'LeetCode',
 };
 
 const STATUS_LABEL: Record<ProgressStatus, string> = {
@@ -39,6 +47,7 @@ export function QuestionList(): React.ReactElement {
   // Search is applied client-side against the already-fetched page so typing does not refetch.
   // The catalogue is small enough that this is both simpler and faster than debouncing a request.
   const { data, isPending, isError, error } = useQuestions(filters);
+  const catalogue = useQuestions({});
 
   const questions = useMemo(() => {
     const needle = search.trim().toLowerCase();
@@ -94,6 +103,7 @@ export function QuestionList(): React.ReactElement {
       <FilterPanel
         filters={filters}
         onChange={setFilters}
+        facets={facetsOf(catalogue.data?.questions ?? [])}
         className="order-1 w-full shrink-0 lg:order-2 lg:w-64"
       />
     </div>
@@ -146,13 +156,34 @@ function QuestionCard({ question }: { question: QuestionSummary }): React.ReactE
   );
 }
 
+interface Facets {
+  topics: Topic[];
+  companies: Company[];
+}
+
+/** The values actually present in the catalogue, so a filter never offers an empty result. */
+function facetsOf(questions: readonly QuestionSummary[]): Facets {
+  const topics = new Set<Topic>();
+  const companies = new Set<Company>();
+  for (const question of questions) {
+    for (const topic of question.topics) topics.add(topic);
+    for (const company of question.companies) companies.add(company);
+  }
+  return {
+    topics: [...topics].sort(),
+    companies: [...companies].sort(),
+  };
+}
+
 function FilterPanel({
   filters,
   onChange,
+  facets,
   className,
 }: {
   filters: ListQuestionsQuery;
   onChange: (next: ListQuestionsQuery) => void;
+  facets: Facets;
   className?: string;
 }): React.ReactElement {
   function set<K extends keyof ListQuestionsQuery>(key: K, value: ListQuestionsQuery[K]): void {
@@ -180,6 +211,18 @@ function FilterPanel({
         ) : null}
       </div>
 
+      <FilterGroup label="Track">
+        {trackSchema.options.map((value) => (
+          <FilterChip
+            key={value}
+            active={filters.track === value}
+            onClick={() => set('track', value)}
+          >
+            {TRACK_LABEL[value]}
+          </FilterChip>
+        ))}
+      </FilterGroup>
+
       <FilterGroup label="Difficulty">
         {difficultySchema.options.map((value) => (
           <FilterChip
@@ -205,7 +248,7 @@ function FilterPanel({
       </FilterGroup>
 
       <FilterGroup label="Topic">
-        {ALGO_TOPICS.map((value) => (
+        {facets.topics.map((value) => (
           <FilterChip
             key={value}
             active={filters.topic === value}
@@ -217,7 +260,7 @@ function FilterPanel({
       </FilterGroup>
 
       <FilterGroup label="Company">
-        {COMPANIES.map((value) => (
+        {facets.companies.map((value) => (
           <FilterChip
             key={value}
             active={filters.company === value}
@@ -285,25 +328,3 @@ function ListSkeleton(): React.ReactElement {
     </ul>
   );
 }
-
-/** The topics phase 1 content actually uses; the enum also carries the frontend ones for later. */
-const ALGO_TOPICS = topicSchema.options.filter((topic) =>
-  (
-    [
-      'arrays',
-      'bit-manipulation',
-      'counting',
-      'greedy',
-      'hashing',
-      'math',
-      'prefix-sums',
-      'sorting',
-      'stacks',
-      'strings',
-    ] as string[]
-  ).includes(topic),
-);
-
-const COMPANIES = companySchema.options.filter((company) =>
-  (['toptal', 'google', 'meta', 'amazon'] as string[]).includes(company),
-);

@@ -1,0 +1,18 @@
+You are climbing a staircase of `n` steps. Each move takes you up either `1` or `2` steps.
+
+Return the number of distinct ways to reach the top.
+
+## Examples
+
+| n   | answer | ways                  |
+| --- | ------ | --------------------- |
+| `2` | `2`    | `1+1`, `2`            |
+| `3` | `3`    | `1+1+1`, `1+2`, `2+1` |
+| `1` | `1`    | `1`                   |
+
+## Assumptions
+
+- `n` is an integer within the range `[1 .. 45]`.
+
+The upper bound is not arbitrary: the answer roughly doubles for every extra step, and by `n = 45`
+it is already over a billion.

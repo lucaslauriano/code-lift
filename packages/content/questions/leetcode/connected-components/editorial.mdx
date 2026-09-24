@@ -1,0 +1,53 @@
+## A ideia central
+
+Comece com `n` componentes e subtraia um toda vez que uma aresta juntar dois grupos que eram
+separados. Uma aresta dentro do mesmo grupo não muda nada — é por isso que arestas duplicadas são
+inofensivas de graça.
+
+## As duas soluções
+
+**Travessia:** monte a lista de adjacência, percorra a partir de cada nó não visitado, conte quantas
+travessias foram necessárias. `O(V + E)`, e precisa ser iterativa — uma cadeia de 100.000 nós
+derruba DFS recursiva.
+
+**Union-find:** é a da solução de referência.
+
+```ts
+let components = n;
+for (const [a, b] of edges) {
+  const ra = find(a),
+    rb = find(b);
+  if (ra === rb) continue; // já estavam juntos
+  union(ra, rb);
+  components--;
+}
+```
+
+Sem lista de adjacência, sem pilha, sem nada que possa ir fundo demais.
+
+## As duas otimizações que importam
+
+**Compressão de caminho:** ao buscar a raiz, aponte todo mundo do caminho direto para ela.
+
+**União por tamanho:** pendure a árvore menor sob a maior.
+
+Sem elas, uma sequência de uniões em cadeia constrói uma árvore linear e cada `find` custa `O(N)` —
+o caso de performance `path` é exatamente essa sequência. Com elas, cada operação é
+`O(α(N))`, que na prática é constante.
+
+**Complexidade:** tempo `O(V + E·α(V))`, espaço `O(V)`.
+
+## Armadilhas
+
+- **Nós isolados contam.** `n = 4` sem arestas são `4` componentes, não `0` nem `1`.
+- **Decrementar sempre que vê uma aresta.** Só quando a união realmente acontece.
+- **Esquecer que o grafo é não-dirigido.** Na versão com travessia, cada aresta entra nas duas
+  listas de adjacência.
+- **Union-find sem compressão.** Passa nos casos pequenos e arrasta no caso em cadeia.
+
+## O que o avaliador está medindo aqui
+
+Se você conhece union-find e sabe **quando** ele ganha da travessia. Aqui as duas são `O(V + E)`; a
+diferença é que union-find não precisa montar o grafo e responde bem a arestas que chegam em fluxo.
+Se a pergunta seguinte for "e se as arestas forem chegando ao longo do tempo?", a travessia tem que
+recomeçar do zero e o union-find só continua — é essa a resposta que o avaliador está esperando.

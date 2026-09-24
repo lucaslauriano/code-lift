@@ -1,0 +1,55 @@
+## A ideia central
+
+É o balde de tinta do Paint: a partir do pixel inicial, repinte todo vizinho que tenha a **cor
+original**, em quatro direções.
+
+## A armadilha que trava o programa
+
+```ts
+if (image[sr][sc] === colour) return image; // sem isso, laço infinito
+```
+
+Se a cor nova já é igual à original, cada pixel repintado continua batendo com a cor procurada — os
+vizinhos voltam a qualificar, entram na pilha de novo, e o preenchimento não termina. O segundo
+exemplo do enunciado existe só para isso, e é o caso que mais quebra submissão.
+
+## A solução ótima
+
+```ts
+const original = image[sr][sc];
+if (original === colour) return image;
+
+const stack = [sr * cols + sc];
+image[sr][sc] = colour;
+
+while (stack.length > 0) {
+  const cell = stack.pop()!;
+  const r = Math.floor(cell / cols),
+    c = cell % cols;
+  // para cada vizinho com cor === original: pinta e empilha
+}
+```
+
+Pintar **ao empilhar** serve de marcação de visitado: um pixel já pintado não bate mais com
+`original`, então nunca entra duas vezes.
+
+Iterativa porque uma imagem 300×300 de cor única é uma região de 90.000 pixels — recursão não
+sobrevive a isso.
+
+**Complexidade:** tempo `O(R × C)`, espaço `O(R × C)`.
+
+## Armadilhas
+
+- **Cor nova igual à original.** Laço infinito.
+- **Comparar com a cor do vizinho em vez da original.** Depois de pintar o primeiro pixel, a
+  referência muda e o preenchimento vaza para regiões que não deveria tocar.
+- **Diagonais.**
+- **Cor `0`.** É uma cor válida; `if (!image[r][c])` trata como ausente.
+- **Recursão.** Caso de performance.
+
+## O que o avaliador está medindo aqui
+
+É a forma mais pura do padrão de flood fill, e serve de aquecimento antes de "número de ilhas". O
+sinal que o avaliador procura é se você identifica o caso degenerado **antes** de rodar — perguntar
+"e se a cor nova for igual à atual?" em voz alta, no primeiro minuto, vale mais do que a solução
+inteira.

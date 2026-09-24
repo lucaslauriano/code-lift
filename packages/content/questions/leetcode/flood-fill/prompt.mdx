@@ -1,0 +1,21 @@
+An image is a grid of integers, each one a pixel colour. Starting from the pixel at `(sr, sc)`,
+repaint it and every pixel connected to it — horizontally or vertically — that shares its original
+colour. Return the image.
+
+Diagonals do not connect.
+
+## Examples
+
+| image                       | sr, sc | colour | result                      |
+| --------------------------- | ------ | ------ | --------------------------- |
+| `[[1,1,1],[1,1,0],[1,0,1]]` | `1, 1` | `2`    | `[[2,2,2],[2,2,0],[2,0,1]]` |
+| `[[0,0,0],[0,0,0]]`         | `0, 0` | `0`    | `[[0,0,0],[0,0,0]]`         |
+
+The second row is the case to think about: the new colour already matches, so nothing changes — and
+a careless solution loops forever.
+
+## Assumptions
+
+- The image has between `1` and `300` rows and between `1` and `300` columns.
+- Each colour is an integer within the range `[0 .. 65,535]`.
+- `sr` and `sc` are inside the image.

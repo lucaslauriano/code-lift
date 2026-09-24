@@ -1,0 +1,14 @@
+{
+  "slug": "climbing-stairs",
+  "title": "Climbing Stairs",
+  "type": "algo",
+  "difficulty": "easy",
+  "summary": "Count the ways to climb n stairs taking one or two steps at a time.",
+  "topics": ["dynamic-programming", "math"],
+  "companies": ["amazon", "apple", "google"],
+  "estimatedMinutes": 15,
+  "source": "LeetCode 70",
+  "track": "leetcode",
+  "performanceExemption": "The problem caps n at 45, because the answer outgrows a 64-bit integer soon after. There is no input large enough to separate an O(N) solution from anything else.",
+  "expectedComplexity": { "time": "O(N)", "space": "O(1)" }
+}

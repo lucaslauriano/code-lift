@@ -1,0 +1,13 @@
+{
+  "slug": "max-area-of-island",
+  "title": "Max Area of Island",
+  "type": "algo",
+  "difficulty": "medium",
+  "summary": "Return the size of the largest connected region of land in a grid.",
+  "topics": ["matrix", "graphs", "arrays"],
+  "companies": ["google", "amazon"],
+  "estimatedMinutes": 22,
+  "source": "LeetCode 695",
+  "track": "leetcode",
+  "expectedComplexity": { "time": "O(R * C)", "space": "O(R * C)" }
+}

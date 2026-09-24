@@ -1,0 +1,57 @@
+## A ideia central
+
+Varra a grade. Ao encontrar terra ainda não visitada, some uma ilha e **afunde** a região inteira
+com um flood fill, para que ela nunca seja contada de novo.
+
+## A armadilha: recursão
+
+```ts
+function sink(r: number, c: number) {
+  if (fora(r, c) || grid[r][c] !== '1') return;
+  grid[r][c] = '0';
+  sink(r + 1, c);
+  sink(r - 1, c);
+  sink(r, c + 1);
+  sink(r, c - 1);
+}
+```
+
+Curto, claro, e **estoura** numa grade 300×300 toda de terra: a região tem 90.000 células e a
+recursão vai fundo o suficiente para derrubar a pilha. É de longe a forma mais comum de uma solução
+correta de ilhas falhar de verdade — e o caso de performance `allLand` existe para mostrar isso.
+
+## A solução ótima
+
+Pilha explícita, e a célula codificada como um número só:
+
+```ts
+stack.push(row * cols + col);
+// ...
+const cell = stack.pop()!;
+const r = Math.floor(cell / cols);
+const c = cell % cols;
+```
+
+Guardar `[r, c]` como array funciona; guardar um inteiro evita alocar 90.000 arrays de dois
+elementos.
+
+Marcar visitado sobrescrevendo com `'0'` dispensa uma estrutura de visitados — o enunciado permite
+modificar a grade. Se não permitisse, um `Uint8Array(rows * cols)` faz o mesmo papel.
+
+**Complexidade:** tempo `O(R × C)`, espaço `O(R × C)` no pior caso da pilha.
+
+## Armadilhas
+
+- **Diagonais.** Só quatro direções. `["10", "01"]` são duas ilhas.
+- **Marcar ao desempilhar em vez de ao empilhar.** A mesma célula entra na pilha várias vezes pelos
+  vizinhos e o custo multiplica; marque no momento em que empilha.
+- **Confundir `'1'` (string) com `1` (número).** A grade é de strings.
+- **Recursão.** O caso de performance.
+
+## O que o avaliador está medindo aqui
+
+É a questão de grafo mais pedida que existe, e a variação mais frequente de "percorra um grafo
+implícito". O que distingue as respostas é a robustez: quase todo mundo escreve a recursiva, e quase
+ninguém pergunta quão grande a grade pode ser. Também vale perceber que BFS e DFS dão a mesma
+resposta aqui — a escolha é só sobre memória, e dizer isso mostra que você entendeu que a ordem de
+visita não importa neste problema.

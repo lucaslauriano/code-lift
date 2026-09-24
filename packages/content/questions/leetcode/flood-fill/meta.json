@@ -1,0 +1,13 @@
+{
+  "slug": "flood-fill",
+  "title": "Flood Fill",
+  "type": "algo",
+  "difficulty": "easy",
+  "summary": "Repaint the connected region of equal colour starting from one pixel.",
+  "topics": ["matrix", "graphs"],
+  "companies": ["amazon", "meta"],
+  "estimatedMinutes": 18,
+  "source": "LeetCode 733",
+  "track": "leetcode",
+  "expectedComplexity": { "time": "O(R * C)", "space": "O(R * C)" }
+}

@@ -1,0 +1,63 @@
+## A ideia central
+
+Mantenha uma janela `[low, high]` que certamente contém o alvo se ele existir, e corte metade a cada
+passo.
+
+## As três decisões que definem a questão
+
+O algoritmo tem quatro linhas e três armadilhas. Cada uma tem uma versão errada que parece certa.
+
+**1. `while (low <= high)`, não `<`**
+
+Com `<`, uma janela de um elemento nunca é examinada. `[1, 2]` procurando `2`: `low=0, high=1`,
+`mid=0`, `nums[0] < 2` → `low=1`. Agora `low === high` e o laço para sem olhar a posição 1. Responde
+`-1` para um alvo que estava lá.
+
+**2. `high = mid - 1`, não `high = mid`**
+
+Com `high = mid`, a janela para de encolher quando tem um elemento (`mid` passa a ser sempre o mesmo
+índice) e o laço roda para sempre. Esse é o bug que trava o navegador, não o que devolve resposta
+errada.
+
+**3. `low + (high - low) / 2`, não `(low + high) / 2`**
+
+Em JavaScript os dois são idênticos — números são doubles e `low + high` não estoura em nada que
+caiba num array. Em Java ou C# com `int`, `low + high` estoura para negativo em arrays grandes, e o
+`mid` negativo indexa fora. É o bug famoso que ficou vinte anos na biblioteca padrão do Java.
+Escrever da forma segura não custa nada e é o hábito que o entrevistador reconhece.
+
+## A solução
+
+```ts
+let low = 0,
+  high = nums.length - 1;
+while (low <= high) {
+  const mid = low + Math.floor((high - low) / 2);
+  if (nums[mid] === target) return mid;
+  if (nums[mid] < target) low = mid + 1;
+  else high = mid - 1;
+}
+return -1;
+```
+
+**Complexidade:** tempo `O(log N)`, espaço `O(1)`.
+
+## Por que esta questão não tem caso de performance
+
+Com o limite de 100.000 elementos, uma varredura linear termina em menos de um milissegundo. Nenhum
+caso executável distingue `O(N)` de `O(log N)` aqui. O que quebra de verdade nesta questão é o laço
+infinito ou o off-by-one — e esses os casos escondidos de borda pegam.
+
+## Armadilhas
+
+- As três acima.
+- **`Math.floor` esquecido.** Um `mid` fracionário indexa `undefined`.
+- **Retornar `low` no fim.** Isso é o índice de inserção, resposta de uma questão parecida e
+  diferente.
+
+## O que o avaliador está medindo aqui
+
+Se você escreve busca binária **certa na primeira tentativa**, sem rodar. É um clássico dizer que a
+maioria dos programadores erra ao escrever de cabeça, e o avaliador sabe disso — é por isso que ela
+aparece. Acertar as três decisões e conseguir justificar cada uma vale mais aqui do que em qualquer
+questão mais difícil, porque não há onde se esconder.

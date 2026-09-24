@@ -1,0 +1,14 @@
+{
+  "slug": "binary-search",
+  "title": "Binary Search",
+  "type": "algo",
+  "difficulty": "easy",
+  "summary": "Find a target in a sorted array in logarithmic time.",
+  "topics": ["binary-search", "arrays"],
+  "companies": ["amazon", "google", "microsoft"],
+  "estimatedMinutes": 12,
+  "source": "LeetCode 704",
+  "track": "leetcode",
+  "performanceExemption": "A linear scan over the maximum 100k input finishes in under a millisecond, so no runnable case tells it apart from binary search. The bug this question actually produces is an infinite loop or an off-by-one, which the hidden boundary cases catch.",
+  "expectedComplexity": { "time": "O(log N)", "space": "O(1)" }
+}

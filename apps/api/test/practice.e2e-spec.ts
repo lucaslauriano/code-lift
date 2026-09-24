@@ -208,6 +208,44 @@ describe('mock sessions', () => {
     expect(body.finishedAt).toBeNull();
   });
 
+  it('does not hand out the same three questions every time', async () => {
+    const draws = new Set<string>();
+
+    for (let attempt = 0; attempt < 8; attempt += 1) {
+      const { body } = await request(server)
+        .post('/mock-sessions')
+        .set('Cookie', cookie)
+        .send({ preset: 'toptal_codility' })
+        .expect(201);
+
+      draws.add([...(body.questionSlugs as string[])].sort().join(','));
+      await request(server)
+        .post(`/mock-sessions/${body.id}/finish`)
+        .set('Cookie', cookie)
+        .expect(201);
+    }
+
+    // A deterministic picker yields exactly one distinct draw. With nineteen eligible questions,
+    // eight identical draws by chance is not worth guarding against.
+    expect(draws.size).toBeGreaterThan(1);
+  });
+
+  it('only ever draws from the Codility track', async () => {
+    const { body } = await request(server)
+      .post('/mock-sessions')
+      .set('Cookie', cookie)
+      .send({ preset: 'toptal_codility' })
+      .expect(201);
+
+    for (const slug of body.questionSlugs as string[]) {
+      const detail = await request(server)
+        .get(`/questions/${slug}`)
+        .set('Cookie', cookie)
+        .expect(200);
+      expect(detail.body.meta.track).toBe('codility');
+    }
+  });
+
   it('refuses a second session while one is running', async () => {
     await request(server)
       .post('/mock-sessions')

@@ -1,0 +1,56 @@
+## A ideia central
+
+O último movimento até o degrau `n` veio do degrau `n-1` ou do `n-2`, e esses dois conjuntos de
+caminhos não têm interseção. Logo `f(n) = f(n-1) + f(n-2)` — Fibonacci, deslocado em um.
+
+## A solução ingênua
+
+```ts
+function solution(n) {
+  if (n <= 2) return n;
+  return solution(n - 1) + solution(n - 2);
+}
+```
+
+Correta e `O(2^n)`. Para `n = 45` são cerca de 3×10^9 chamadas: alguns minutos, não alguns
+milissegundos. A árvore de recursão recalcula `f(20)` dezenas de milhares de vezes.
+
+Memoizar resolve e deixa `O(N)` em tempo com `O(N)` de espaço — e ainda usa `O(N)` de pilha.
+
+## A solução ótima
+
+Só os dois últimos valores importam:
+
+```ts
+let previous = 1,
+  current = 1;
+for (let step = 2; step <= n; step++) {
+  const next = previous + current;
+  previous = current;
+  current = next;
+}
+return current;
+```
+
+**Complexidade:** tempo `O(N)`, espaço `O(1)`.
+
+## Por que esta questão não tem caso de performance
+
+O enunciado limita `n` a 45, e o limite não é arbitrário: a resposta praticamente dobra a cada
+degrau, e em `n = 45` já passa de um bilhão. Em `n = 79` ela estoura o inteiro seguro do JavaScript.
+Não existe entrada grande o bastante para distinguir `O(N)` de `O(1)` aqui — o que a questão mede é
+se você **evita** a exponencial, e para isso `n = 45` já basta.
+
+## Armadilhas
+
+- **Caso base.** `f(1) = 1` e `f(2) = 2`. Começar de `f(0) = 0` desloca tudo e devolve o Fibonacci
+  errado.
+- **Recursão pura.** Aceitável escrever primeiro, desde que você diga em seguida por que não serve.
+- **Tabela `O(N)`.** Não está errado; só é desnecessário, e o entrevistador vai pedir para reduzir.
+
+## O que o avaliador está medindo aqui
+
+É a porta de entrada da programação dinâmica, e a pergunta real é se você consegue **enunciar a
+recorrência** antes de escrever código. Quem diz "as formas de chegar em n são as de chegar em n-1
+mais as de chegar em n-2, porque o último passo é 1 ou 2" já resolveu; o resto é digitação. A
+redução de `O(N)` para `O(1)` de espaço é o follow-up padrão.

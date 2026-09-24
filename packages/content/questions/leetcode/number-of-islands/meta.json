@@ -1,0 +1,13 @@
+{
+  "slug": "number-of-islands",
+  "title": "Number of Islands",
+  "type": "algo",
+  "difficulty": "medium",
+  "summary": "Count connected regions of land in a grid of land and water.",
+  "topics": ["matrix", "graphs", "arrays"],
+  "companies": ["amazon", "google", "meta", "microsoft"],
+  "estimatedMinutes": 25,
+  "source": "LeetCode 200",
+  "track": "leetcode",
+  "expectedComplexity": { "time": "O(R * C)", "space": "O(R * C)" }
+}

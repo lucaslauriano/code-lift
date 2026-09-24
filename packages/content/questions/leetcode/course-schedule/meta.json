@@ -1,0 +1,13 @@
+{
+  "slug": "course-schedule",
+  "title": "Course Schedule",
+  "type": "algo",
+  "difficulty": "medium",
+  "summary": "Decide whether a set of course prerequisites can be completed — cycle detection.",
+  "topics": ["graphs", "counting"],
+  "companies": ["amazon", "google", "meta"],
+  "estimatedMinutes": 30,
+  "source": "LeetCode 207",
+  "track": "leetcode",
+  "expectedComplexity": { "time": "O(V + E)", "space": "O(V + E)" }
+}

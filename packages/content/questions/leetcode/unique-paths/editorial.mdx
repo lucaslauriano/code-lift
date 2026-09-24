@@ -1,0 +1,65 @@
+## A ideia central
+
+Só dá para entrar numa célula pela esquerda ou por cima, então `caminhos(r, c) = caminhos(r-1, c) +
+caminhos(r, c-1)`. A primeira linha e a primeira coluna têm exatamente um caminho cada — só existe
+uma direção possível.
+
+## A solução ingênua
+
+```ts
+function solution(m, n) {
+  if (m === 1 || n === 1) return 1;
+  return solution(m - 1, n) + solution(m, n - 1);
+}
+```
+
+`O(2^(m+n))`. Numa grade 17×17 já são bilhões de chamadas.
+
+## A tabela, e como reduzi-la
+
+A tabela completa é `m × n`:
+
+```ts
+const dp = Array.from({ length: m }, () => new Array(n).fill(1));
+for (let r = 1; r < m; r++) for (let c = 1; c < n; c++) dp[r][c] = dp[r - 1][c] + dp[r][c - 1];
+```
+
+Mas cada linha só lê a anterior. Preenchendo da esquerda para a direita num array único de largura
+`n`, o valor que você **sobrescreve** é justamente o "de cima", e o que já está à esquerda é o "da
+esquerda":
+
+```ts
+const row = new Array(n).fill(1);
+for (let r = 1; r < m; r++) for (let c = 1; c < n; c++) row[c] += row[c - 1];
+return row[n - 1];
+```
+
+Uma linha de laço, `O(N)` de espaço. Essa leitura — "o que vou sobrescrever é exatamente o que
+preciso" — é a redução de dimensão clássica de PD.
+
+**Complexidade:** tempo `O(M × N)`, espaço `O(N)`.
+
+## A solução fechada
+
+Todo caminho tem `m - 1` descidas e `n - 1` movimentos à direita, em alguma ordem. Então a resposta é
+`C(m + n - 2, m - 1)` — `O(min(m, n))` em tempo e `O(1)` em espaço. Precisa de cuidado com overflow
+ao multiplicar antes de dividir, mas é a melhor resposta e mostra que você viu a combinatória por
+trás da PD.
+
+## Por que esta questão não tem caso de performance
+
+O enunciado limita a grade a 100×100 exatamente porque a resposta explode: `C(198, 99)` tem 59
+dígitos. Dentro dos limites onde o resultado cabe num inteiro de 32 bits, qualquer solução não
+exponencial termina instantaneamente. O que se mede é evitar a exponencial, e para isso 17×17 basta.
+
+## Armadilhas
+
+- **Inicializar a tabela com zeros.** A primeira linha e a primeira coluna são `1`.
+- **Preencher da direita para a esquerda** no array único. Aí você lê o valor novo em vez do antigo.
+- **Overflow na fórmula combinatória.** Multiplique e divida alternadamente.
+
+## O que o avaliador está medindo aqui
+
+Reconhecer PD numa grade — o esqueleto de edit distance, subsequência comum e caminho de custo
+mínimo. Quem entrega a tabela `O(M × N)` respondeu; quem reduz para `O(N)` e explica por que o
+in-place funciona mostrou que entende a recorrência, e não só o padrão.
