@@ -1,0 +1,5 @@
+{
+  "extends": "@code-lift/config/tsconfig/base.json",
+  "include": [],
+  "files": []
+}

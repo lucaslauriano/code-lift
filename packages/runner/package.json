@@ -1,0 +1,36 @@
+{
+  "name": "@code-lift/runner",
+  "version": "0.1.0",
+  "private": true,
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "node scripts/build-worker.mjs && tsc -p tsconfig.json",
+    "dev": "node scripts/build-worker.mjs && tsc -p tsconfig.json --watch --preserveWatchOutput",
+    "typecheck": "node scripts/build-worker.mjs && tsc -p tsconfig.json --noEmit",
+    "lint": "eslint .",
+    "pretest": "node scripts/build-worker.mjs",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@code-lift/shared": "workspace:*",
+    "sucrase": "catalog:"
+  },
+  "devDependencies": {
+    "@code-lift/config": "workspace:*",
+    "@types/node": "catalog:",
+    "esbuild": "^0.28.2",
+    "eslint": "catalog:",
+    "typescript": "catalog:",
+    "vitest": "catalog:"
+  }
+}

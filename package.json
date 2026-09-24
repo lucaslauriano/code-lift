@@ -1,0 +1,31 @@
+{
+  "name": "code-lift",
+  "version": "0.1.0",
+  "private": true,
+  "packageManager": "pnpm@10.32.1",
+  "engines": {
+    "node": ">=22.12"
+  },
+  "scripts": {
+    "dev": "turbo run dev",
+    "build": "turbo run build",
+    "lint": "turbo run lint",
+    "test": "turbo run test",
+    "typecheck": "turbo run typecheck",
+    "format": "prettier --write \"**/*.{ts,tsx,js,mjs,json,md,mdx,yaml,yml}\"",
+    "format:check": "prettier --check \"**/*.{ts,tsx,js,mjs,json,md,mdx,yaml,yml}\"",
+    "content:validate": "pnpm --filter @code-lift/content run validate",
+    "content:sync": "pnpm --filter @code-lift/content run sync",
+    "db:up": "docker compose up -d postgres",
+    "db:migrate": "pnpm --filter @code-lift/api run db:migrate",
+    "db:seed": "pnpm --filter @code-lift/api run db:seed",
+    "test:e2e": "pnpm --filter @code-lift/web run test:e2e"
+  },
+  "devDependencies": {
+    "@code-lift/config": "workspace:*",
+    "eslint": "catalog:",
+    "prettier": "catalog:",
+    "turbo": "^2.11.3",
+    "typescript": "catalog:"
+  }
+}
