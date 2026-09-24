@@ -1,0 +1,56 @@
+## A ideia central
+
+Junte os índices `0..n` e os valores do array numa única operação que cancela pares. Cada valor
+presente encontra o próprio índice e some; o que falta não tem com quem cancelar.
+
+## A solução ingênua
+
+```ts
+for (let v = 0; v <= n; v++) if (!nums.includes(v)) return v;
+```
+
+`O(N^2)`. A versão com `Set` é `O(N)` em tempo mas `O(N)` em espaço, e o enunciado pede `O(1)`.
+
+Ordenar e procurar o buraco é `O(N log N)` e muta a entrada.
+
+## A solução ótima
+
+Duas respostas certas, e a escolha entre elas é o ponto da questão.
+
+**Gauss:**
+
+```ts
+const n = nums.length;
+let sum = (n * (n + 1)) / 2;
+for (const v of nums) sum -= v;
+return sum;
+```
+
+**XOR:**
+
+```ts
+let result = nums.length;
+for (let i = 0; i < nums.length; i++) result ^= i ^ nums[i];
+return result;
+```
+
+Ambas `O(N)` tempo e `O(1)` espaço. A diferença: com `n = 100.000` a soma chega a ~5×10^9, **acima**
+do limite de um inteiro de 32 bits com sinal. Em JavaScript cabe num `double` e as duas funcionam;
+em Java ou C# com `int`, a de Gauss estoura silenciosamente e a de XOR não.
+
+**Complexidade:** tempo `O(N)`, espaço `O(1)`.
+
+## Armadilhas
+
+- **A faixa é `0..n`, não `1..n`.** Este é o primo 0-based do _Perm Missing Elem_. Trocar as duas
+  fórmulas desloca tudo em um.
+- **`[0]` responde `1` e `[1]` responde `0`.** Os dois casos de um elemento, em direções opostas.
+- **`reduce` sem valor inicial** em array de um elemento devolve o próprio elemento, não a soma.
+- **XOR em valores acima de 2^31.** Aqui não acontece (`n ≤ 100.000`), mas os operadores bit a bit
+  do JS convertem para inteiro de 32 bits **com sinal** — em outro problema isso morde.
+
+## O que o avaliador está medindo aqui
+
+Se você conhece mais de uma solução e sabe escolher. Quase todo candidato chega em Gauss; mencionar
+o XOR _e o motivo_ (não estoura) é o que distingue. Se o entrevistador perguntar "e se n fosse um
+bilhão?", a resposta já está na sua boca.

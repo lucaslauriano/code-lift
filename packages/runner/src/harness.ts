@@ -7,6 +7,7 @@ import {
   type RunStatus,
   type TestCase,
 } from '@code-lift/shared';
+import { deepCloneInput } from './clone';
 import { captureConsole } from './console-capture';
 import { deepEqual } from './deep-equal';
 import type { SolutionFn } from './evaluate';
@@ -129,9 +130,7 @@ async function runSingleCase(
 }
 
 function cloneArgs(input: readonly unknown[]): unknown[] {
-  return input.map((value) =>
-    value === null || typeof value !== 'object' ? value : structuredClone(value),
-  );
+  return input.map(deepCloneInput);
 }
 
 function aggregate(results: readonly CaseResult[]): RunStatus {

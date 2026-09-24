@@ -1,0 +1,28 @@
+Given the root of a binary tree, return its maximum depth — the number of nodes along the longest
+path from the root down to a leaf.
+
+A tree node is a plain object:
+
+```ts
+interface TreeNode {
+  val: number;
+  left: TreeNode | null;
+  right: TreeNode | null;
+}
+```
+
+An empty tree is `null` and has depth `0`.
+
+## Examples
+
+| tree                    | answer |
+| ----------------------- | ------ |
+| `3 → (9, 20 → (15, 7))` | `3`    |
+| `1 → (null, 2)`         | `2`    |
+| `null`                  | `0`    |
+
+## Assumptions
+
+- The tree holds between `0` and `100,000` nodes.
+- Each `val` is an integer within the range `[-100 .. 100]`.
+- The tree can be deep: do not assume it fits on the call stack.

@@ -1,0 +1,21 @@
+Given an integer array `nums`, move every `0` to the end while keeping the relative order of the
+non-zero elements. Return the resulting array.
+
+> **Difference from LeetCode.** There, the function mutates the array in place and returns nothing.
+> Here it returns the array, because this runner grades the return value. Still solve it with `O(1)`
+> extra space — writing into the input and returning it is the intended shape, not building a new
+> array.
+
+## Examples
+
+| nums               | answer             |
+| ------------------ | ------------------ |
+| `[0, 1, 0, 3, 12]` | `[1, 3, 12, 0, 0]` |
+| `[0]`              | `[0]`              |
+| `[1, 2, 3]`        | `[1, 2, 3]`        |
+
+## Assumptions
+
+- The length of `nums` is within the range `[1 .. 100,000]`.
+- Each element is an integer within the range `[-1,000,000,000 .. 1,000,000,000]`.
+- Expected worst-case time complexity is `O(N)`, using `O(1)` extra space.

@@ -1,0 +1,64 @@
+## A ideia central
+
+Dois ponteiros no mesmo array: um lê tudo, o outro só avança quando algo diferente de zero é
+gravado. No fim, o ponteiro de escrita marca exatamente onde os zeros começam.
+
+## A solução ingênua
+
+```ts
+for (let i = 0; i < nums.length; i++) {
+  if (nums[i] === 0) {
+    nums.splice(i, 1);
+    nums.push(0);
+    i--;
+  }
+}
+```
+
+`O(N^2)`: cada `splice` desloca a cauda inteira. Com 100.000 elementos quase todos zero — o caso
+`zerosThenOne` — são 5×10^9 movimentações.
+
+Construir um array novo com `filter` e completar com zeros é `O(N)` em tempo, mas `O(N)` de espaço
+extra, o que o enunciado pede para evitar.
+
+## A solução ótima
+
+```ts
+let write = 0;
+for (let read = 0; read < nums.length; read++) {
+  if (nums[read] !== 0) nums[write++] = nums[read];
+}
+for (let i = write; i < nums.length; i++) nums[i] = 0;
+return nums;
+```
+
+**Complexidade:** tempo `O(N)`, espaço `O(1)`.
+
+## A variante com troca, e quando ela perde
+
+```ts
+for (let read = 0; read < nums.length; read++) {
+  if (nums[read] !== 0) [nums[write], nums[read]] = [nums[read], nums[write++]];
+}
+```
+
+Uma passagem só, e é a resposta mais comum. Mas ela escreve mesmo quando os dois ponteiros
+coincidem — ou seja, em **todos** os elementos de um array sem zero nenhum. A versão de compactar e
+preencher escreve cada posição uma vez. A diferença é pequena e o entrevistador gosta que você a
+perceba.
+
+## Armadilhas
+
+- **Perder a ordem relativa.** Trocar o zero com o último elemento resolve rápido e quebra a ordem.
+  O enunciado pede estabilidade.
+- **Preencher o rabo com o comprimento errado.** É de `write` até o fim, não de `write + 1`.
+- **`splice` dentro do laço.** Além de quadrático, mexe nos índices enquanto você itera.
+- **Construir um array novo.** Passa nos testes aqui, mas responde a pergunta errada — o exercício é
+  sobre espaço constante.
+
+## O que o avaliador está medindo aqui
+
+O padrão de dois ponteiros lento/rápido, que reaparece em remover duplicatas, particionar e no
+passo de partição do quicksort. Reconhecê-lo é o ponto. O segundo sinal é a estabilidade: quem
+troca com o fim entrega algo que "parece certo" e falha num caso que o enunciado descreveu em
+palavras.

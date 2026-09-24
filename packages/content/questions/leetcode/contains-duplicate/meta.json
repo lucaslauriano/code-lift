@@ -1,0 +1,13 @@
+{
+  "slug": "contains-duplicate",
+  "title": "Contains Duplicate",
+  "type": "algo",
+  "difficulty": "easy",
+  "summary": "Decide whether any value appears more than once in an array.",
+  "topics": ["hashing", "arrays"],
+  "companies": ["google", "amazon"],
+  "estimatedMinutes": 8,
+  "source": "LeetCode 217",
+  "track": "leetcode",
+  "expectedComplexity": { "time": "O(N)", "space": "O(N)" }
+}

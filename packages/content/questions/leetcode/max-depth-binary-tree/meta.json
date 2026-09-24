@@ -1,0 +1,13 @@
+{
+  "slug": "max-depth-binary-tree",
+  "title": "Maximum Depth of Binary Tree",
+  "type": "algo",
+  "difficulty": "easy",
+  "summary": "Return the number of nodes on the longest root-to-leaf path.",
+  "topics": ["trees", "recursion"],
+  "companies": ["amazon", "google"],
+  "estimatedMinutes": 10,
+  "source": "LeetCode 104",
+  "track": "leetcode",
+  "expectedComplexity": { "time": "O(N)", "space": "O(H)" }
+}

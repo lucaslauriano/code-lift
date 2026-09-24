@@ -1,0 +1,62 @@
+## A ideia central
+
+Conte as letras de uma string e gaste na outra. Se os tamanhos batem e nenhuma contagem fica
+negativa, todas terminaram em zero.
+
+## A solução ingênua
+
+```ts
+for (const c of s) {
+  const i = t.indexOf(c);
+  if (i === -1) return false;
+  t = t.slice(0, i) + t.slice(i + 1); // remove a letra consumida
+}
+```
+
+`O(N^2)`: `indexOf` varre e `slice` realoca a string inteira a cada letra. Com 100.000 caracteres
+não termina.
+
+## A solução ótima
+
+```ts
+if (s.length !== t.length) return false;
+
+const counts = new Int32Array(26);
+for (let i = 0; i < s.length; i++) counts[s.charCodeAt(i) - 97]++;
+for (let i = 0; i < t.length; i++) {
+  if (--counts[t.charCodeAt(i) - 97] < 0) return false;
+}
+return true;
+```
+
+A verificação de tamanho no começo **não é um detalhe de otimização**: é ela que dispensa a segunda
+varredura no fim. Sem ela, `"a"` e `"aab"` passariam pelo laço sem negativos.
+
+Um `Int32Array(26)` em vez de um `Map`: alfabeto fixo, sem hashing e sem alocação por chave.
+
+**Complexidade:** tempo `O(N)`, espaço `O(1)`.
+
+## A alternativa
+
+```ts
+return [...s].sort().join('') === [...t].sort().join('');
+```
+
+`O(N log N)`, uma linha, passa nos casos de performance. É a resposta certa quando o alfabeto é
+Unicode arbitrário e um array de contagem não serve — vale mencionar as duas e dizer quando cada uma
+ganha.
+
+## Armadilhas
+
+- **Esquecer a comparação de tamanho.** É o caso `"a"` vs `"ab"`.
+- **Duas strings vazias são anagramas.** Responde `true`.
+- **Assumir ASCII quando o enunciado não garante.** Aqui garante (minúsculas). Se não garantisse,
+  `charCodeAt` quebra em emoji e acentos — aí é `Map` ou `codePointAt`.
+- **`sort()` sobre a string.** Strings não têm `sort`; é preciso espalhar em array antes.
+
+## O que o avaliador está medindo aqui
+
+Se você escolhe a estrutura pelo tamanho do domínio. Todo mundo sabe contar letras; a diferença é
+usar 26 posições fixas em vez de um `Map`, e conseguir explicar por quê. A segunda coisa é a
+verificação de tamanho — quem a coloca por reflexo ganha a segunda passagem de graça e geralmente
+nem percebe que ganhou.

@@ -1,0 +1,13 @@
+{
+  "slug": "valid-anagram",
+  "title": "Valid Anagram",
+  "type": "algo",
+  "difficulty": "easy",
+  "summary": "Decide whether two strings are anagrams of each other.",
+  "topics": ["hashing", "strings", "counting"],
+  "companies": ["amazon", "microsoft"],
+  "estimatedMinutes": 10,
+  "source": "LeetCode 242",
+  "track": "leetcode",
+  "expectedComplexity": { "time": "O(N)", "space": "O(K)" }
+}

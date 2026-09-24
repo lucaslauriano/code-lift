@@ -1,0 +1,54 @@
+## A ideia central
+
+Um conjunto responde "já vi isso?" em `O(1)`. Insira enquanto consulta e pare no primeiro repetido.
+
+## A solução ingênua
+
+```ts
+for (let i = 0; i < n; i++) for (let j = i + 1; j < n; j++) if (nums[i] === nums[j]) return true;
+```
+
+`O(N^2)` — 5×10^9 comparações com 100.000 elementos. `nums.includes(x)` dentro de um laço é a mesma
+coisa escrita de outro jeito.
+
+Ordenar e comparar vizinhos é `O(N log N)` e passa, mas muta a entrada (ou custa uma cópia) e é mais
+lenta que o conjunto.
+
+## A solução ótima
+
+```ts
+const seen = new Set<number>();
+for (const value of nums) {
+  if (seen.has(value)) return true;
+  seen.add(value);
+}
+return false;
+```
+
+**Complexidade:** tempo `O(N)` no pior caso, espaço `O(N)`.
+
+## A versão de uma linha, e por que não é melhor
+
+```ts
+return new Set(nums).size !== nums.length;
+```
+
+Mesma ideia, mais curta, e **sempre** constrói o conjunto inteiro. Com uma duplicata na segunda
+posição, o laço com saída antecipada faz duas operações e a versão de uma linha faz 100.000. No pior
+caso as duas empatam; no caso comum, não.
+
+Vale saber as duas e escolher conscientemente — é exatamente o tipo de justificativa que um
+entrevistador pede.
+
+## Armadilhas
+
+- **`0` e `-0`.** `Set` usa SameValueZero, então são o mesmo valor: `[0, -0]` responde `true`.
+- **Ordenar sem comparador.** Se você for pelo caminho do `sort`, `[10, 9].sort()` não ordena
+  números.
+- **Mutar a entrada.** `nums.sort()` ordena o array de quem chamou.
+
+## O que o avaliador está medindo aqui
+
+Nada de algoritmo — é aquecimento. O que se observa é se você chega no `Set` de primeira e se sabe
+dizer por que a variante com saída antecipada é preferível. Gastar mais de dois minutos aqui é o
+sinal ruim.

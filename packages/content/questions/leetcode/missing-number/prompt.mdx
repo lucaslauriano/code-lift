@@ -1,0 +1,21 @@
+An array `nums` holds `n` distinct numbers taken from the range `[0 .. n]`. Exactly one value in
+that range is missing. Return it.
+
+## Examples
+
+| nums                          | answer |
+| ----------------------------- | ------ |
+| `[3, 0, 1]`                   | `2`    |
+| `[0, 1]`                      | `2`    |
+| `[9, 6, 4, 2, 3, 5, 7, 0, 1]` | `8`    |
+| `[0]`                         | `1`    |
+| `[1]`                         | `0`    |
+
+## Assumptions
+
+- `n` is the length of `nums`, within the range `[1 .. 100,000]`.
+- All values are distinct and within the range `[0 .. n]`.
+- Expected worst-case time complexity is `O(N)`, using `O(1)` extra space.
+
+This is the `0`-based cousin of _Perm Missing Elem_, which works over `1 .. N+1`. The technique is
+the same; the off-by-one is not.

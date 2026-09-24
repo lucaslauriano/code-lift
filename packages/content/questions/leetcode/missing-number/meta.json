@@ -1,0 +1,13 @@
+{
+  "slug": "missing-number",
+  "title": "Missing Number",
+  "type": "algo",
+  "difficulty": "easy",
+  "summary": "One value is missing from 0..n. Find it without extra space.",
+  "topics": ["math", "bit-manipulation", "arrays"],
+  "companies": ["amazon", "microsoft"],
+  "estimatedMinutes": 10,
+  "source": "LeetCode 268",
+  "track": "leetcode",
+  "expectedComplexity": { "time": "O(N)", "space": "O(1)" }
+}

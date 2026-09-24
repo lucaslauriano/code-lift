@@ -1,0 +1,13 @@
+{
+  "slug": "move-zeroes",
+  "title": "Move Zeroes",
+  "type": "algo",
+  "difficulty": "easy",
+  "summary": "Push every zero to the end while keeping the other values in order.",
+  "topics": ["two-pointers", "arrays"],
+  "companies": ["meta", "amazon"],
+  "estimatedMinutes": 12,
+  "source": "LeetCode 283",
+  "track": "leetcode",
+  "expectedComplexity": { "time": "O(N)", "space": "O(1)" }
+}

@@ -1,0 +1,65 @@
+## A ideia central
+
+A profundidade de uma árvore é um mais a maior profundidade entre os filhos. A recursão escreve
+isso em três linhas; o problema é a pilha.
+
+## A solução recursiva
+
+```ts
+function solution(root: TreeNode | null): number {
+  if (root === null) return 0;
+  return 1 + Math.max(solution(root.left), solution(root.right));
+}
+```
+
+Correta, `O(N)` em tempo, e **quebra** no caso de performance. Uma árvore degenerada de 100.000 nós
+é uma corrente: 100.000 quadros de pilha, e o motor estoura com `RangeError: Maximum call stack size
+exceeded` antes de qualquer questão de tempo.
+
+Esse é o ponto da questão neste app. No LeetCode o limite é 10^4 nós e a recursão passa; aqui o
+caso de 100.000 existe justamente para mostrar por que "funciona no site" não é o mesmo que
+"funciona".
+
+## A solução ótima
+
+Pilha explícita, carregando a profundidade junto do nó:
+
+```ts
+const nodes = [root];
+const depths = [1];
+let deepest = 0;
+
+while (nodes.length > 0) {
+  const node = nodes.pop()!;
+  const depth = depths.pop()!;
+  if (depth > deepest) deepest = depth;
+  if (node.left) {
+    nodes.push(node.left);
+    depths.push(depth + 1);
+  }
+  if (node.right) {
+    nodes.push(node.right);
+    depths.push(depth + 1);
+  }
+}
+return deepest;
+```
+
+**Complexidade:** tempo `O(N)`, espaço `O(H)` — que é `O(N)` na corrente e `O(log N)` na
+balanceada.
+
+Uma BFS por níveis também serve e é igualmente robusta: conte quantas rodadas a fila faz.
+
+## Armadilhas
+
+- **Árvore vazia é `0`.** E um nó só é `1`, não `0` — a questão conta **nós**, não arestas.
+- **`Math.max` com um filho ausente.** `solution(null)` tem que devolver `0`, não `-Infinity`.
+- **Profundidade em variável global.** Funciona e impede a solução de ser reentrante; prefira passá-la.
+- **Recursão em árvore de entrada não confiável.** É o caso de performance aqui.
+
+## O que o avaliador está medindo aqui
+
+A questão é trivial — é o aquecimento das perguntas de árvore. O que se observa é se você pergunta
+"quão profunda pode ser?" antes de escrever recursão. Num sistema real essa é a diferença entre um
+serviço que funciona e um que cai com uma entrada malformada, e o entrevistador quase sempre puxa
+esse fio depois que você entrega a versão recursiva.
