@@ -1,0 +1,66 @@
+## A ideia central
+
+Desça subtraindo. Em cada nó, passe adiante "quanto ainda falta"; numa folha, a resposta é
+`falta === node.val`.
+
+## A armadilha: o que é uma folha
+
+```ts
+if (!node) return targetSum === 0; // ERRADO
+```
+
+Parece elegante e está errado por dois motivos. Primeiro, a árvore vazia responderia `true` para
+alvo `0`, e o enunciado diz `false`. Segundo, e pior, num nó com **um** filho só ele desce pelo lado
+`null` e conclui que o caminho terminou ali — mas um nó com um filho não é folha, e o caminho não
+pode acabar nele.
+
+O caso escondido `1 → (2, null)` com alvo `1` existe exatamente para isso: a soma até a raiz bate,
+e a resposta é `false`.
+
+A condição certa é explícita:
+
+```ts
+if (node.left === null && node.right === null) return remaining === node.val;
+```
+
+## A solução ótima
+
+```ts
+const nodes = [root];
+const remaining = [targetSum];
+
+while (nodes.length > 0) {
+  const node = nodes.pop()!;
+  const owed = remaining.pop()!;
+
+  if (node.left === null && node.right === null) {
+    if (owed === node.val) return true;
+    continue;
+  }
+  if (node.left) {
+    nodes.push(node.left);
+    remaining.push(owed - node.val);
+  }
+  if (node.right) {
+    nodes.push(node.right);
+    remaining.push(owed - node.val);
+  }
+}
+return false;
+```
+
+**Complexidade:** tempo `O(N)`, espaço `O(H)`.
+
+## Armadilhas
+
+- **Tratar `null` como folha.** É o erro principal.
+- **Podar quando a soma passa do alvo.** Só funciona se todos os valores forem positivos — e o
+  enunciado permite negativos. O caso `5 → -3 → 20` com alvo `22` mostra a soma caindo e voltando.
+- **Árvore vazia.** `false`, sempre.
+- **Recursão.** Caso de performance com 100.000 de profundidade.
+
+## O que o avaliador está medindo aqui
+
+A definição de folha, e se você pergunta sobre valores negativos antes de otimizar. Podar caminhos
+cuja soma já passou do alvo é a primeira ideia de quase todo mundo, e é uma otimização inválida aqui
+— reconhecer isso sozinho vale mais do que a solução, que é mecânica.

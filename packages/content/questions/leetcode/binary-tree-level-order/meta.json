@@ -1,0 +1,13 @@
+{
+  "slug": "binary-tree-level-order",
+  "title": "Binary Tree Level Order Traversal",
+  "type": "algo",
+  "difficulty": "medium",
+  "summary": "Return the node values grouped by depth, top to bottom.",
+  "topics": ["trees", "graphs"],
+  "companies": ["amazon", "meta", "microsoft"],
+  "estimatedMinutes": 20,
+  "source": "LeetCode 102",
+  "track": "leetcode",
+  "expectedComplexity": { "time": "O(N)", "space": "O(W)" }
+}

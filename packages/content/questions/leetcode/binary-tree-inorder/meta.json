@@ -1,0 +1,13 @@
+{
+  "slug": "binary-tree-inorder",
+  "title": "Binary Tree Inorder Traversal",
+  "type": "algo",
+  "difficulty": "easy",
+  "summary": "Return the values of a binary tree in inorder, without recursion.",
+  "topics": ["trees", "stacks"],
+  "companies": ["microsoft", "amazon"],
+  "estimatedMinutes": 15,
+  "source": "LeetCode 94",
+  "track": "leetcode",
+  "expectedComplexity": { "time": "O(N)", "space": "O(H)" }
+}

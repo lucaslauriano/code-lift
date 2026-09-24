@@ -1,0 +1,13 @@
+{
+  "slug": "validate-bst",
+  "title": "Validate Binary Search Tree",
+  "type": "algo",
+  "difficulty": "medium",
+  "summary": "Decide whether a binary tree satisfies the binary-search-tree ordering.",
+  "topics": ["trees", "stacks"],
+  "companies": ["amazon", "meta", "microsoft"],
+  "estimatedMinutes": 20,
+  "source": "LeetCode 98",
+  "track": "leetcode",
+  "expectedComplexity": { "time": "O(N)", "space": "O(H)" }
+}

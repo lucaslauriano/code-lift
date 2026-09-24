@@ -1,0 +1,13 @@
+{
+  "slug": "path-sum",
+  "title": "Path Sum",
+  "type": "algo",
+  "difficulty": "easy",
+  "summary": "Decide whether some root-to-leaf path adds up to a target.",
+  "topics": ["trees", "recursion"],
+  "companies": ["amazon", "microsoft"],
+  "estimatedMinutes": 15,
+  "source": "LeetCode 112",
+  "track": "leetcode",
+  "expectedComplexity": { "time": "O(N)", "space": "O(H)" }
+}

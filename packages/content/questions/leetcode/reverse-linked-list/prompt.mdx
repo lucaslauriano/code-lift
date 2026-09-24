@@ -1,0 +1,24 @@
+Reverse a singly linked list and return the head of the reversed list.
+
+A node is a plain object:
+
+```ts
+interface ListNode {
+  val: number;
+  next: ListNode | null;
+}
+```
+
+## Examples
+
+| list                | answer              |
+| ------------------- | ------------------- |
+| `1 → 2 → 3 → 4 → 5` | `5 → 4 → 3 → 2 → 1` |
+| `1 → 2`             | `2 → 1`             |
+| empty (`null`)      | `null`              |
+
+## Assumptions
+
+- The list holds between `0` and `100,000` nodes.
+- Each `val` is an integer within the range `[-5,000 .. 5,000]`.
+- Expected worst-case time complexity is `O(N)`, using `O(1)` extra space.

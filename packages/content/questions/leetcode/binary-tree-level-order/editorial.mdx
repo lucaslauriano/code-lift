@@ -1,0 +1,55 @@
+## A ideia central
+
+BFS com uma fila, processando **um nível inteiro por volta do laço externo**. Ler o tamanho da fila
+antes do laço interno é a técnica inteira: naquele instante a fila contém exatamente um nível.
+
+```ts
+while (fila não vazia) {
+  const tamanhoDoNivel = fila.length;        // fotografa o nível
+  for (let i = 0; i < tamanhoDoNivel; i++) { // consome só ele
+    const node = desenfileira();
+    nivel.push(node.val);
+    enfileira(node.left, node.right);        // vão para o próximo nível
+  }
+}
+```
+
+## A armadilha de desempenho
+
+```ts
+const node = queue.shift();
+```
+
+`shift()` remove do início do array, o que **reindexa todos os outros elementos**. Num nível com
+32.768 nós isso é `O(N)` por desenfileiramento e `O(N^2)` no total. É o caso de performance da
+árvore perfeita.
+
+A correção é não remover nada: mantenha um índice de cabeça.
+
+```ts
+const queue = [root];
+let head = 0;
+while (head < queue.length) {
+  const levelSize = queue.length - head;
+  // ...
+  const node = queue[head++];
+}
+```
+
+O array cresce e nunca encolhe; a memória é `O(N)` em vez de `O(W)`, o que é um preço justo.
+
+## Armadilhas
+
+- **`shift()` numa fila grande.** É o erro que só aparece em escala.
+- **Árvore vazia devolve `[]`**, não `[[]]`.
+- **Ler `queue.length` dentro do laço interno.** Ele cresce enquanto você enfileira filhos, e os
+  níveis se fundem num array só.
+- **DFS com profundidade.** Também funciona (`levels[depth].push(val)`), mas recursiva estoura na
+  corrente de 100.000 — e iterativa é mais código que a BFS.
+
+## O que o avaliador está medindo aqui
+
+BFS por níveis é a base de metade das perguntas de árvore: vista lateral, média por nível, zigzag,
+nó mais à direita. Quem tem esse esqueleto na mão responde todas elas. O detalhe que separa é o
+`shift()`: a solução "certa" e a solução rápida são a mesma coisa exceto por uma linha, e perceber
+qual é exige saber o custo real de uma operação de array.

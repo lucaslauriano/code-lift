@@ -1,0 +1,26 @@
+Given the root of a binary tree, return its values level by level, left to right — one array per
+depth.
+
+A tree node is a plain object:
+
+```ts
+interface TreeNode {
+  val: number;
+  left: TreeNode | null;
+  right: TreeNode | null;
+}
+```
+
+## Examples
+
+| tree                    | answer                    |
+| ----------------------- | ------------------------- |
+| `3 → (9, 20 → (15, 7))` | `[[3], [9, 20], [15, 7]]` |
+| `1`                     | `[[1]]`                   |
+| `null`                  | `[]`                      |
+
+## Assumptions
+
+- The tree holds between `0` and `100,000` nodes.
+- Each `val` is an integer within the range `[-1,000 .. 1,000]`.
+- The tree can be deep or wide; neither shape should break your solution.

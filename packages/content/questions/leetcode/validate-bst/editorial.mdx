@@ -1,0 +1,71 @@
+## A ideia central
+
+Percurso em ordem (_inorder_) numa BST devolve os valores **em ordem crescente**. Então a pergunta
+"isso é uma BST?" vira "essa sequência é estritamente crescente?" — uma comparação com o valor
+anterior, e pronto.
+
+## A solução errada que quase funciona
+
+```ts
+function check(node) {
+  if (!node) return true;
+  if (node.left && node.left.val >= node.val) return false;
+  if (node.right && node.right.val <= node.val) return false;
+  return check(node.left) && check(node.right);
+}
+```
+
+Compara cada nó só com os **filhos imediatos**, e é por isso que o segundo exemplo existe:
+
+```
+      5
+     / \
+    1   4
+       / \
+      3   6
+```
+
+Todo par pai/filho está correto, e a árvore é inválida — o `3` está na subárvore direita do `5` e é
+menor que ele. O enunciado diz "**todo** valor na subárvore", não "o filho".
+
+## As duas soluções certas
+
+**Limites propagados:** cada nó carrega um intervalo `(min, max)` que herda do caminho até ele.
+
+```ts
+function check(node, min, max) {
+  if (!node) return true;
+  if ((min !== null && node.val <= min) || (max !== null && node.val >= max)) return false;
+  return check(node.left, min, node.val) && check(node.right, node.val, max);
+}
+```
+
+**Inorder crescente** — é a da solução de referência, e é mais curta porque não precisa carregar
+limite nenhum:
+
+```ts
+let previous: number | null = null;
+// percorre inorder iterativamente
+if (previous !== null && current.val <= previous) return false;
+previous = current.val;
+```
+
+**Complexidade:** ambas `O(N)` em tempo e `O(H)` em espaço.
+
+## Armadilhas
+
+- **Comparar só com os filhos.** É o erro central.
+- **Usar `Infinity` como limite inicial em linguagem de inteiros.** Em JS funciona; em Java, usar
+  `Integer.MIN_VALUE` quebra numa árvore que contém exatamente `Integer.MIN_VALUE`. Por isso os
+  limites aqui são `null`, não sentinelas numéricos.
+- **Valores iguais.** A definição é estrita: `1 → (1, null)` é inválida.
+- **Recursão em árvore degenerada.** 100.000 de profundidade.
+- **Não sair cedo.** Não é erro de corretude, mas o caso de performance com a violação no fundo
+  mostra a diferença.
+
+## O que o avaliador está medindo aqui
+
+Se você lê "todo valor na subárvore" e implementa isso, em vez de implementar o que parece
+equivalente. A armadilha é famosa justamente porque a solução errada passa nos exemplos que a maioria
+inventa de cabeça. A segunda coisa é reconhecer a propriedade do inorder — quem enxerga isso escreve
+metade do código e ganha a explicação de graça.

@@ -78,3 +78,26 @@ describe('deepEqual', () => {
     expect(deepEqual(a, b)).toBe(false);
   });
 });
+
+describe('deepEqual on deep structures', () => {
+  /** A right-leaning chain, the shape a linked list takes. */
+  function chain(length: number, tweakLast?: number): { val: number; next: unknown } {
+    let head: unknown = null;
+    for (let i = length; i >= 1; i -= 1) {
+      head = { val: i === length && tweakLast !== undefined ? tweakLast : i, next: head };
+    }
+    return head as { val: number; next: unknown };
+  }
+
+  it('compares two 100k-deep lists without exhausting the stack', () => {
+    expect(deepEqual(chain(100_000), chain(100_000))).toBe(true);
+  });
+
+  it('still finds a difference at the far end of a deep list', () => {
+    expect(deepEqual(chain(100_000), chain(100_000, -1))).toBe(false);
+  });
+
+  it('finds a length difference between deep lists', () => {
+    expect(deepEqual(chain(100_000), chain(99_999))).toBe(false);
+  });
+});

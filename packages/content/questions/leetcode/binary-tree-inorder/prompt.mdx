@@ -1,0 +1,26 @@
+Given the root of a binary tree, return its node values in **inorder**: left subtree, then the node,
+then the right subtree.
+
+A tree node is a plain object:
+
+```ts
+interface TreeNode {
+  val: number;
+  left: TreeNode | null;
+  right: TreeNode | null;
+}
+```
+
+## Examples
+
+| tree                        | answer      |
+| --------------------------- | ----------- |
+| `1 → (null, 2 → (3, null))` | `[1, 3, 2]` |
+| `null`                      | `[]`        |
+| `1`                         | `[1]`       |
+
+## Assumptions
+
+- The tree holds between `0` and `100,000` nodes.
+- Each `val` is an integer within the range `[-100 .. 100]`.
+- The tree can be deep: do not assume it fits on the call stack.

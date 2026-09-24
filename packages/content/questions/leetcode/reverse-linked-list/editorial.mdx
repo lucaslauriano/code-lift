@@ -1,0 +1,51 @@
+## A ideia central
+
+Três ponteiros caminhando uma vez: o anterior, o atual e o próximo. A cada passo, vire a seta do
+atual para trás.
+
+## A ordem dentro do laço é o problema inteiro
+
+```ts
+while (current !== null) {
+  const next = current.next; // 1. guarda antes de destruir
+  current.next = previous; // 2. vira a seta
+  previous = current; // 3. anda
+  current = next;
+}
+return previous;
+```
+
+Inverta as linhas 1 e 2 e o resto da lista fica inalcançável: você acabou de sobrescrever o único
+ponteiro que apontava para ela, e o laço termina depois de um nó.
+
+**Complexidade:** tempo `O(N)`, espaço `O(1)`.
+
+## A solução recursiva
+
+```ts
+function solution(head) {
+  if (head === null || head.next === null) return head;
+  const newHead = solution(head.next);
+  head.next.next = head;
+  head.next = null;
+  return newHead;
+}
+```
+
+Elegante, e **estoura** com 100.000 nós. É `O(N)` de espaço na pilha de chamadas, o que também viola
+o `O(1)` pedido. Vale conhecer para a pergunta "e recursivamente?", com a ressalva do limite.
+
+## Armadilhas
+
+- **Perder o `next`.** O erro de ordenação acima.
+- **Devolver `current` no fim.** Ao sair do laço, `current` é `null`. A nova cabeça é `previous`.
+- **Lista vazia.** `previous` começa em `null`, então o retorno já é `null` sem caso especial.
+- **Não zerar a cauda.** Na versão recursiva, esquecer `head.next = null` cria um ciclo — e aí o
+  próprio comparador de resultados roda para sempre.
+
+## O que o avaliador está medindo aqui
+
+É a questão de lista ligada mais pedida que existe, e ninguém ganha ponto por acertar. Ganha-se por
+acertar **sem hesitar** e por saber dizer por que a recursiva não serve quando `O(1)` de espaço faz
+parte do enunciado. É também o esqueleto de "reverter em grupos de k" e de "lista é palíndromo?",
+que são as perguntas seguintes.

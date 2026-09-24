@@ -1,0 +1,13 @@
+{
+  "slug": "reverse-linked-list",
+  "title": "Reverse Linked List",
+  "type": "algo",
+  "difficulty": "easy",
+  "summary": "Reverse a singly linked list and return the new head.",
+  "topics": ["linked-lists", "two-pointers"],
+  "companies": ["amazon", "meta", "microsoft", "apple"],
+  "estimatedMinutes": 12,
+  "source": "LeetCode 206",
+  "track": "leetcode",
+  "expectedComplexity": { "time": "O(N)", "space": "O(1)" }
+}

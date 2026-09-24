@@ -1,0 +1,74 @@
+## A ideia central
+
+DFS carregando o caminho construído até ali. Numa folha, o caminho está pronto.
+
+## A armadilha clássica
+
+A versão que usa um array compartilhado:
+
+```ts
+function walk(node, path, out) {
+  path.push(node.val);
+  if (isLeaf(node)) out.push(path.join('->'));
+  if (node.left) walk(node.left, path, out);
+  if (node.right) walk(node.right, path, out);
+  path.pop(); // ← esquecer isso é o bug
+}
+```
+
+Sem o `pop` final, o caminho da segunda folha vem com o ramo da primeira grudado. Funciona numa
+árvore com um ramo só e falha em qualquer bifurcação — o caso `four leaves` existe para isso.
+
+Passar o prefixo **por valor** elimina o problema por construção:
+
+```ts
+walk(node.left, `${prefix}->${node.left.val}`, out);
+```
+
+Strings em JS são imutáveis, então cada ramo tem a sua e não há o que desfazer.
+
+## A solução ótima
+
+```ts
+const nodes = [root];
+const prefixes = [String(root.val)];
+
+while (nodes.length > 0) {
+  const node = nodes.pop()!;
+  const prefix = prefixes.pop()!;
+  if (node.left === null && node.right === null) {
+    paths.push(prefix);
+    continue;
+  }
+  if (node.right) {
+    nodes.push(node.right);
+    prefixes.push(`${prefix}->${node.right.val}`);
+  }
+  if (node.left) {
+    nodes.push(node.left);
+    prefixes.push(`${prefix}->${node.left.val}`);
+  }
+}
+```
+
+Empilhar o filho **direito primeiro** faz o esquerdo ser desempilhado antes, o que dá a ordem da
+esquerda para a direita na saída.
+
+**Complexidade:** tempo `O(N × H)`, espaço `O(N × H)` — a saída em si é quadrática no pior caso, e é
+por isso que esta questão não tem caso de performance: um input grande mediria a concatenação de
+strings, não a travessia. O LeetCode limita a 100 nós pelo mesmo motivo.
+
+## Armadilhas
+
+- **Esquecer o backtrack** no array compartilhado.
+- **Tratar um nó com um filho como folha.** `1 → (2 → 4, 3)` tem dois caminhos, não três.
+- **Árvore vazia devolve `[]`**.
+- **Montar a string com `+` num laço sobre um array acumulado.** Funciona; só não confunda com a
+  economia real, que é não copiar o array.
+
+## O que o avaliador está medindo aqui
+
+Backtracking em sua forma mais simples, e se você escolhe a representação que torna o erro
+impossível em vez da que exige disciplina. É a mesma decisão que aparece em permutações, combinações
+e N-rainhas — lá o array compartilhado é necessário por memória, e aí o `pop` vira obrigatório.
+Saber _quando_ cada uma serve é o ponto.

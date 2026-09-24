@@ -1,0 +1,32 @@
+Given the root of a binary tree, decide whether it is a valid binary search tree.
+
+A tree is a valid BST when, for every node:
+
+- **every** value in its left subtree is strictly less than the node's value, and
+- **every** value in its right subtree is strictly greater.
+
+Note the word _every_: it is not enough for a node to be larger than its immediate left child.
+
+A tree node is a plain object:
+
+```ts
+interface TreeNode {
+  val: number;
+  left: TreeNode | null;
+  right: TreeNode | null;
+}
+```
+
+## Examples
+
+| tree                  | answer  | why                                                    |
+| --------------------- | ------- | ------------------------------------------------------ |
+| `2 → (1, 3)`          | `true`  |                                                        |
+| `5 → (1, 4 → (3, 6))` | `false` | `3` is in the right subtree of `5` but smaller than it |
+| `null`                | `true`  | vacuously                                              |
+
+## Assumptions
+
+- The tree holds between `0` and `100,000` nodes.
+- Each `val` is an integer within the range `[-2,147,483,648 .. 2,147,483,647]`.
+- The tree can be deep: do not assume it fits on the call stack.

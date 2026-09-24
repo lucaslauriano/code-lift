@@ -1,0 +1,31 @@
+Given the root of a binary tree and an integer `targetSum`, return `true` if the tree has a
+**root-to-leaf** path whose values add up to `targetSum`.
+
+A leaf is a node with no children. A path must end at a leaf — stopping halfway does not count.
+
+A tree node is a plain object:
+
+```ts
+interface TreeNode {
+  val: number;
+  left: TreeNode | null;
+  right: TreeNode | null;
+}
+```
+
+## Examples
+
+| tree                                               | targetSum | answer                  |
+| -------------------------------------------------- | --------- | ----------------------- |
+| `5 → (4 → (11 → (7, 2)), 8 → (13, 4 → (null, 1)))` | `22`      | `true` (5 + 4 + 11 + 2) |
+| `1 → (2, 3)`                                       | `5`       | `false`                 |
+| `null`                                             | `0`       | `false`                 |
+
+The empty tree has no paths at all, so it is `false` even for a target of `0`.
+
+## Assumptions
+
+- The tree holds between `0` and `100,000` nodes.
+- Each `val` and `targetSum` is an integer within the range `[-1,000,000 .. 1,000,000]`.
+- Values can be negative, so a running sum is not monotonic.
+- The tree can be deep: do not assume it fits on the call stack.

@@ -1,0 +1,57 @@
+## A ideia central
+
+Desça à esquerda até o fim empilhando tudo que passar. Ao desempilhar, a subárvore esquerda daquele
+nó já acabou — então o valor dele é o próximo — e você vira à direita.
+
+## A solução recursiva
+
+```ts
+function walk(node, out) {
+  if (!node) return;
+  walk(node.left, out);
+  out.push(node.val);
+  walk(node.right, out);
+}
+```
+
+Clara e correta, e **estoura** no caso de performance: uma corrente de 100.000 nós são 100.000
+quadros de pilha. `RangeError` antes de qualquer questão de tempo.
+
+## A solução ótima
+
+```ts
+const values: number[] = [];
+const stack: TreeNode[] = [];
+let node = root;
+
+while (node !== null || stack.length > 0) {
+  while (node !== null) {
+    stack.push(node);
+    node = node.left;
+  }
+  const current = stack.pop()!;
+  values.push(current.val);
+  node = current.right;
+}
+```
+
+O laço externo tem duas condições porque há dois motivos para continuar: ainda há caminho à esquerda
+para descer, **ou** ainda há nós empilhados esperando a vez.
+
+**Complexidade:** tempo `O(N)`, espaço `O(H)` — `O(N)` na corrente, `O(log N)` na balanceada.
+
+## Armadilhas
+
+- **Condição do laço incompleta.** Só `while (stack.length > 0)` termina cedo; só `while (node)`
+  nunca sobe de volta.
+- **Empilhar o filho direito junto.** A ordem quebra. Só o nó atual entra na pilha.
+- **Árvore vazia devolve `[]`**, não `[null]` nem erro.
+- **Recursão.** É o caso de performance.
+
+## O que o avaliador está medindo aqui
+
+Saber transformar recursão em iteração — a pergunta de follow-up mais garantida em qualquer questão
+de árvore. Todo mundo escreve a versão recursiva; quem sabe explicar _qual estado a pilha de chamadas
+estava guardando_ e reproduzir isso à mão demonstra que entendeu a recursão em vez de decorá-la. Vale
+saber também que inorder numa BST devolve a ordem crescente: é o que torna a próxima questão
+(validar BST) quase gratuita.

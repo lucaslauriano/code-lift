@@ -1,0 +1,14 @@
+{
+  "slug": "binary-tree-paths",
+  "title": "Binary Tree Paths",
+  "type": "algo",
+  "difficulty": "easy",
+  "summary": "List every root-to-leaf path as an arrow-joined string.",
+  "topics": ["trees", "strings", "recursion"],
+  "companies": ["google", "meta"],
+  "estimatedMinutes": 18,
+  "source": "LeetCode 257",
+  "track": "leetcode",
+  "performanceExemption": "The output is one string per leaf containing the whole path, so a large input produces an answer quadratic in the tree size rather than testing the traversal. LeetCode caps this problem at 100 nodes for the same reason.",
+  "expectedComplexity": { "time": "O(N * H)", "space": "O(N * H)" }
+}
