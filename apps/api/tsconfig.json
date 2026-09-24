@@ -1,0 +1,10 @@
+{
+  "extends": "@code-lift/config/tsconfig/nest.json",
+  "compilerOptions": {
+    "outDir": "dist",
+    "rootDir": "src",
+    "types": ["node", "express", "cookie-parser"]
+  },
+  "include": ["src/**/*"],
+  "exclude": ["dist", "test", "src/**/*.spec.ts"]
+}

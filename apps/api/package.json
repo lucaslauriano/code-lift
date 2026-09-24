@@ -1,0 +1,51 @@
+{
+  "name": "@code-lift/api",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json",
+    "dev": "concurrently -n tsc,node -c blue,green \"tsc -p tsconfig.build.json --watch --preserveWatchOutput\" \"node --enable-source-maps --watch dist/main.js\"",
+    "start": "node dist/main.js",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "lint": "eslint .",
+    "test": "vitest run",
+    "db:migrate": "pnpm --filter @code-lift/db run db:migrate",
+    "db:deploy": "pnpm --filter @code-lift/db run db:deploy",
+    "db:seed": "tsx src/seed.ts"
+  },
+  "dependencies": {
+    "@code-lift/content": "workspace:*",
+    "@code-lift/db": "workspace:*",
+    "@code-lift/shared": "workspace:*",
+    "@nestjs/common": "catalog:",
+    "@nestjs/config": "catalog:",
+    "@nestjs/core": "catalog:",
+    "@nestjs/jwt": "catalog:",
+    "@nestjs/platform-express": "catalog:",
+    "@nestjs/swagger": "catalog:",
+    "argon2": "catalog:",
+    "cookie-parser": "catalog:",
+    "reflect-metadata": "catalog:",
+    "rxjs": "catalog:",
+    "zod": "catalog:"
+  },
+  "devDependencies": {
+    "@code-lift/config": "workspace:*",
+    "@nestjs/testing": "catalog:",
+    "@swc/core": "^1.16.2",
+    "@types/cookie-parser": "catalog:",
+    "@types/node": "catalog:",
+    "@types/supertest": "catalog:",
+    "dotenv": "^18.0.3",
+    "eslint": "catalog:",
+    "supertest": "catalog:",
+    "tsx": "catalog:",
+    "typescript": "catalog:",
+    "unplugin-swc": "^2.0.0",
+    "vitest": "catalog:",
+    "@types/express": "^5.0.6",
+    "pg": "^8.18.0",
+    "@types/pg": "^8.15.6",
+    "concurrently": "^10.0.5"
+  }
+}
