@@ -11,7 +11,7 @@ Depois de cada folha, verificar se o trecho inteiro está coberto:
 ```ts
 for (let t = 0; t < a.length; t++) {
   covered.add(a[t]);
-  if (allCovered(covered, x)) return t;   // varre 1..X de novo
+  if (allCovered(covered, x)) return t; // varre 1..X de novo
 }
 ```
 
@@ -34,7 +34,7 @@ for (let time = 0; time < a.length; time++) {
   if (covered[position] === 0) {
     covered[position] = 1;
     remaining--;
-    if (remaining === 0) return time;     // saída imediata
+    if (remaining === 0) return time; // saída imediata
   }
 }
 return -1;

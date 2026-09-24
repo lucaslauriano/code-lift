@@ -1,0 +1,13 @@
+{
+  "slug": "missing-closing-tags",
+  "title": "Missing Closing Tags",
+  "type": "algo",
+  "difficulty": "easy",
+  "summary": "Count how many closing tags a log line is missing, ignoring stray closings.",
+  "topics": ["parsing", "strings", "counting"],
+  "companies": ["toptal"],
+  "estimatedMinutes": 15,
+  "source": "toptal-prep/day1",
+  "track": "codility",
+  "expectedComplexity": { "time": "O(N)", "space": "O(1)" }
+}

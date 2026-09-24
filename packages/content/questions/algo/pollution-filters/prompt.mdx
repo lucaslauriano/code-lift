@@ -1,0 +1,28 @@
+`N` factories sit along a river, in order. Factory `i` emits `P[i]` units of pollution.
+
+A filter can be installed just after any factory. The filter at position `i` has to handle
+everything emitted **downstream of it** — that is, by factories `i + 1` through `N - 1` — and its
+cost is half that amount, rounded up.
+
+Install a filter at every position `0` through `N - 1` and return the total cost.
+
+## Example
+
+Given `P = [5, 6, 3, 4]`:
+
+| position | downstream pollution    | cost               |
+| -------- | ----------------------- | ------------------ |
+| `0`      | `6 + 3 + 4 = 13`        | `ceil(13 / 2) = 7` |
+| `1`      | `3 + 4 = 7`             | `ceil(7 / 2) = 4`  |
+| `2`      | `4`                     | `ceil(4 / 2) = 2`  |
+| `3`      | nothing downstream, `0` | `0`                |
+
+Total: `7 + 4 + 2 + 0 = 13`.
+
+Note that the filter at the last position always costs `0` — there is nothing after it.
+
+## Assumptions
+
+- `N` is an integer within the range `[1 .. 100,000]`.
+- Each element of `P` is an integer within the range `[0 .. 1,000,000,000]`.
+- Expected worst-case time complexity is `O(N)`.

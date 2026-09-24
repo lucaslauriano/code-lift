@@ -1,0 +1,65 @@
+## A ideia central
+
+O array de pais descreve as estradas numa direção só, mas elas são de mão dupla. Construa a lista de
+adjacência nos **dois sentidos** e faça uma BFS a partir da capital: BFS visita em ordem de
+distância, então cada cidade recebe a distância do pai mais um.
+
+## A solução ingênua
+
+Subir de cada cidade até a capital contando saltos:
+
+```ts
+for (let i = 0; i < n; i++) {
+  let d = 0,
+    node = i;
+  while (t[node] !== node) {
+    node = t[node];
+    d++;
+  }
+  result[d - 1]++;
+}
+```
+
+Correto, e `O(N × profundidade)`. Numa árvore em caminho (cada cidade pendurada na anterior) a
+profundidade é `N`, então isso é `O(N^2)` — 10^10 passos no caso de performance `deepPath`.
+
+Também não serve DFS recursiva: com 100.000 níveis a pilha de chamadas estoura antes do tempo.
+
+## A solução ótima
+
+```ts
+// 1. achar a capital (T[i] === i) e montar adjacência bidirecional
+// 2. BFS com fila, distância do vizinho = distância atual + 1
+// 3. contar quantas cidades caíram em cada distância
+```
+
+A parte que realmente importa para o desempenho é **não** usar `Map<number, number[]>`: com 100.000
+cidades isso são 100.000 arrays pequenos alocados. A versão da solução monta um único
+`Int32Array` de vizinhos, fatiado por um array de deslocamentos — a mesma ideia de CSR usada em
+bibliotecas de grafos. Um `Map` de arrays passa, mas a diferença é visível.
+
+**Complexidade:** tempo `O(N)`, espaço `O(N)`.
+
+## Armadilhas
+
+- **Adjacência em uma direção só.** Se você só liga filho→pai, a BFS a partir da capital não
+  alcança ninguém (a capital não tem pai). É o erro que faz a resposta vir vazia.
+- **A capital é `T[i] === i`, não `0`.** Vários casos aqui têm a capital no meio ou no fim.
+- **O laço self-loop.** Se você criar a aresta `capital → capital`, a BFS ainda funciona, mas o grau
+  fica errado e uma contagem por grau se perde.
+- **Índices deslocados.** A resposta em `result[k]` é a distância `k + 1`. A capital, distância `0`,
+  não entra.
+- **Uma única cidade.** `[0]` responde `[]`, não `[0]` nem `[1]`.
+- **Recursão.** `deepPath` tem 100.000 de profundidade.
+
+## O que o avaliador da Toptal está medindo aqui
+
+Essa é a questão difícil da prova, e ela mede se você consegue **montar** a estrutura antes de
+percorrê-la. O enunciado não diz "grafo" em lugar nenhum — dá um array de pais e espera que você
+reconheça uma árvore. Depois mede se você escolhe BFS por um motivo (distância) e não por hábito. E
+os dois casos de performance atacam as duas formas degeneradas que existem: o caminho, que quebra
+recursão, e a estrela, que quebra adjacência mal estruturada.
+
+> **Nota sobre esta questão.** O material de origem tinha dois enunciados diferentes com o mesmo
+> nome — um pedia a distância de cada cidade, outro a contagem por distância. A versão aqui é a
+> segunda, que é a que tinha implementação de referência funcionando.

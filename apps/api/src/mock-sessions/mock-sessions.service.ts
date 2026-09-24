@@ -131,7 +131,9 @@ export class MockSessionsService {
 
     const pool = this.content
       .all()
-      .filter((question) => question.meta.type === 'algo')
+      // Codility track only: a binary tree traversal is a fine question and a terrible thing to
+      // meet in a timed Codility rehearsal.
+      .filter((question) => question.meta.type === 'algo' && question.meta.track === 'codility')
       .map((question) => question.meta);
 
     const unsolved = pool.filter((meta) => !solved.has(meta.slug));

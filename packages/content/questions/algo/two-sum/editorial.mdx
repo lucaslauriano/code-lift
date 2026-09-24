@@ -1,0 +1,49 @@
+## A ideia central
+
+Inverta a pergunta. Em vez de "qual outro elemento fecha par comigo?", pergunte "eu já vi o número
+que me falta?". Um hash map responde isso em `O(1)`.
+
+## A solução ingênua
+
+```ts
+for (let i = 0; i < n; i++)
+  for (let j = i + 1; j < n; j++) if (nums[i] + nums[j] === target) return [i, j];
+```
+
+`O(N^2)`. Com `N = 100.000` são 5×10^9 comparações — não termina.
+
+## A solução ótima
+
+```ts
+const seen = new Map<number, number>();
+for (let i = 0; i < nums.length; i++) {
+  const complement = target - nums[i];
+  const match = seen.get(complement);
+  if (match !== undefined) return [match, i];
+  if (!seen.has(nums[i])) seen.set(nums[i], i);
+}
+```
+
+Uma passagem. **A ordem das duas últimas linhas é o problema inteiro**: consultar antes de inserir
+é o que impede um elemento de fechar par consigo mesmo quando `target === 2 * nums[i]`.
+
+**Complexidade:** tempo `O(N)`, espaço `O(N)`.
+
+## Armadilhas
+
+- **Inserir antes de consultar.** Com `nums = [4, 1, 2, 4]` e `target = 8`, inserir primeiro faz o
+  índice 0 achar a si mesmo e devolver `[0, 0]`.
+- **Sobrescrever a primeira ocorrência.** Com duplicatas, `seen.set` sem o guarda `has` guarda o
+  índice mais recente. Aqui dá no mesmo porque a resposta é única, mas em variações que pedem o
+  par mais à esquerda isso muda o resultado.
+- **Ordenar para usar dois ponteiros.** Funciona e é `O(N log N)`, mas destrói os índices originais
+  — e são os índices que a questão pede.
+- **`undefined` vs `0`.** `if (seen.get(c))` é falso quando o índice guardado é `0`. Compare com
+  `!== undefined`.
+
+## O que o avaliador da Toptal está medindo aqui
+
+É a questão de aquecimento universal, então ninguém ganha ponto por resolver — só se perde por
+resolver mal. O avaliador olha três coisas em dez segundos de leitura: você usou um `Map` (e não
+`indexOf` dentro do laço), você consultou antes de inserir, e você tratou o índice `0` sem cair na
+armadilha de truthiness. Se isso te toma mais de três minutos, é tempo que falta na questão difícil.

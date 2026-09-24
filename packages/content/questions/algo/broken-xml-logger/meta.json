@@ -1,0 +1,13 @@
+{
+  "slug": "broken-xml-logger",
+  "title": "Broken XML Logger",
+  "type": "algo",
+  "difficulty": "medium",
+  "summary": "Count the tags missing from a truncated log, in both directions, per tag name.",
+  "topics": ["parsing", "strings", "counting", "hashing"],
+  "companies": ["toptal"],
+  "estimatedMinutes": 20,
+  "source": "toptal-prep/day1",
+  "track": "codility",
+  "expectedComplexity": { "time": "O(N)", "space": "O(K)" }
+}

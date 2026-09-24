@@ -1,0 +1,13 @@
+{
+  "slug": "xml-tags",
+  "title": "XML Tag Repair",
+  "type": "algo",
+  "difficulty": "medium",
+  "summary": "Count the tags needed to make a nested XML string valid, names included.",
+  "topics": ["stacks", "parsing", "strings"],
+  "companies": ["toptal"],
+  "estimatedMinutes": 25,
+  "source": "toptal-prep/day1",
+  "track": "codility",
+  "expectedComplexity": { "time": "O(N)", "space": "O(N)" }
+}

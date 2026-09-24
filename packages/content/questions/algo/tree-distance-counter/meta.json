@@ -1,0 +1,13 @@
+{
+  "slug": "tree-distance-counter",
+  "title": "Tree Distance Counter",
+  "type": "algo",
+  "difficulty": "hard",
+  "summary": "Given a parent array, count how many cities sit at each distance from the capital.",
+  "topics": ["graphs", "arrays", "counting"],
+  "companies": ["toptal"],
+  "estimatedMinutes": 35,
+  "source": "toptal-prep/day2 (spec taken from the reference implementation)",
+  "track": "codility",
+  "expectedComplexity": { "time": "O(N)", "space": "O(N)" }
+}

@@ -7,6 +7,7 @@ import {
   progressStatusSchema,
   questionTypeSchema,
   submissionStatusSchema,
+  trackSchema,
   topicSchema,
 } from './enums';
 import { questionSummarySchema } from './question';
@@ -30,6 +31,7 @@ export type SessionUser = z.infer<typeof sessionUserSchema>;
 
 export const listQuestionsQuerySchema = z.object({
   type: questionTypeSchema.optional(),
+  track: trackSchema.optional(),
   difficulty: difficultySchema.optional(),
   topic: topicSchema.optional(),
   company: companySchema.optional(),

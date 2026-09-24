@@ -1,0 +1,27 @@
+A string `S` contains tags: `<name>` opens and `</name>` closes. Unlike a flat log, this is a
+**document**: tags must nest properly, and a closing tag must match the innermost opening tag that
+is still unclosed.
+
+Count the minimum number of tags that must be added to make `S` valid, under these rules:
+
+- A closing tag whose name is **not open anywhere** needs an opening tag: count `1`.
+- A closing tag whose name **is open further out** closes it, and every tag it skips over was left
+  unclosed: count `1` for each skipped tag.
+- Anything still open at the end needs a closing tag: count `1` each.
+
+## Examples
+
+| S                          | answer | why                                               |
+| -------------------------- | ------ | ------------------------------------------------- |
+| `"<app><div></app>"`       | `1`    | `</app>` skips `div`, which was never closed      |
+| `"<app><app>"`             | `2`    | neither is closed                                 |
+| `"</app></app>"`           | `2`    | neither has an opening                            |
+| `"<app></div>"`            | `2`    | `div` was never opened, and `app` is never closed |
+| `"<a><b><c></c></a>"`      | `1`    | `c` closes cleanly; `</a>` skips `b`              |
+| `"<app><div></div></app>"` | `0`    | already valid                                     |
+
+## Assumptions
+
+- `S` has length within the range `[0 .. 200,000]`.
+- `S` contains only well-formed tags: `<name>` or `</name>`, with `name` made of lowercase letters.
+- Expected worst-case time complexity is `O(N)`.

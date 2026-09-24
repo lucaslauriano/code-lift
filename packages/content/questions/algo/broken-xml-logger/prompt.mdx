@@ -1,0 +1,25 @@
+A logger writes lines made of tags: `<app>` opens and `</app>` closes. The log can be truncated at
+**both** ends, so it may be missing opening tags at the start as well as closing tags at the end.
+
+Count the minimum number of tags that would have to be added to make every tag balanced.
+
+Each tag name is balanced **independently** — this is a log, not a document, so entries for
+different names interleave freely and nesting between different names carries no meaning.
+
+## Examples
+
+| S                           | answer | why                                     |
+| --------------------------- | ------ | --------------------------------------- |
+| `"<app></app></app></app>"` | `2`    | two closings arrive with nothing open   |
+| `"<app></app><app><app>"`   | `2`    | two are left open                       |
+| `"</app><app><app>"`        | `3`    | one missing opening, then two left open |
+| `"<app></app>"`             | `0`    | balanced                                |
+
+The third row is the one to get right. The leading `</app>` needs an opening in front of it, and
+that is a separate fix from the two tags left open at the end — they do not cancel out.
+
+## Assumptions
+
+- `S` has length within the range `[0 .. 200,000]`.
+- `S` contains only well-formed tags: `<name>` or `</name>`, with `name` made of lowercase letters.
+- Expected worst-case time complexity is `O(N)`.

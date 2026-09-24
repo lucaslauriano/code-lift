@@ -1,0 +1,13 @@
+{
+  "slug": "perm-missing-elem",
+  "title": "Perm Missing Elem",
+  "type": "algo",
+  "difficulty": "easy",
+  "summary": "One value is missing from a permutation of 1..N+1. Find it.",
+  "topics": ["math", "arrays"],
+  "companies": ["toptal"],
+  "estimatedMinutes": 12,
+  "source": "toptal-prep/day1",
+  "track": "codility",
+  "expectedComplexity": { "time": "O(N)", "space": "O(1)" }
+}

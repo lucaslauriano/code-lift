@@ -5,6 +5,7 @@ import {
   progressStatusSchema,
   questionTypeSchema,
   topicSchema,
+  trackSchema,
 } from './enums';
 
 /**
@@ -43,6 +44,16 @@ export const questionMetaSchema = z.object({
   companies: z.array(companySchema).default([]),
   estimatedMinutes: z.number().int().positive().max(240),
   source: z.string().min(1).optional(),
+  track: trackSchema.default('codility'),
+  /**
+   * Why this question ships without performance cases.
+   *
+   * Some problems have no performance dimension to test: climbing stairs caps at n = 45, and a
+   * 100k-node input would only measure the harness. Rather than pad those with meaningless cases,
+   * a question may opt out — but it has to say why, so the exemption stays a decision rather than
+   * an oversight.
+   */
+  performanceExemption: z.string().min(20).optional(),
   /** Big-O the reference solution achieves; surfaced in the UI and in the editorial. */
   expectedComplexity: z.object({ time: z.string().min(1), space: z.string().min(1) }).optional(),
 });

@@ -31,8 +31,19 @@ export async function validateQuestion(question: LoadedQuestion): Promise<Questi
   if (counts.hidden < CASE_REQUIREMENTS.hidden) {
     problems.push(`only ${counts.hidden} hidden cases (need ${CASE_REQUIREMENTS.hidden})`);
   }
-  if (counts.perf < CASE_REQUIREMENTS.perf) {
-    problems.push(`only ${counts.perf} performance cases (need ${CASE_REQUIREMENTS.perf})`);
+  // A question may ship without performance cases, but only by saying why in meta.json. Some
+  // problems genuinely have no performance dimension; silence would hide the ones that just
+  // forgot.
+  if (question.meta.performanceExemption === undefined) {
+    if (counts.perf < CASE_REQUIREMENTS.perf) {
+      problems.push(
+        `only ${counts.perf} performance cases (need ${CASE_REQUIREMENTS.perf}, or set performanceExemption in meta.json)`,
+      );
+    }
+  } else if (counts.perf > 0) {
+    problems.push(
+      `declares performanceExemption but still ships ${counts.perf} performance cases — pick one`,
+    );
   }
 
   if (question.prompt.trim().length < 200) problems.push('prompt.mdx looks empty');

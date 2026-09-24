@@ -1,0 +1,13 @@
+{
+  "slug": "pollution-filters",
+  "title": "Pollution Filters",
+  "type": "algo",
+  "difficulty": "medium",
+  "summary": "Total the cost of a filter at every position along a river, using prefix sums.",
+  "topics": ["prefix-sums", "arrays"],
+  "companies": ["toptal"],
+  "estimatedMinutes": 20,
+  "source": "toptal-prep/day1 (spec taken from the reference implementation)",
+  "track": "codility",
+  "expectedComplexity": { "time": "O(N)", "space": "O(N)" }
+}

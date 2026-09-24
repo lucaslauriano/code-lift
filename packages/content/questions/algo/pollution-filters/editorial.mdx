@@ -1,0 +1,62 @@
+## A ideia central
+
+O custo em cada posição depende da **soma de um sufixo**. Recalcular esse sufixo em cada posição é a
+armadilha; um acumulador percorrendo da direita para a esquerda dá todos eles numa passagem.
+
+## A solução ingênua
+
+```ts
+let total = 0;
+for (let i = 0; i < n; i++) {
+  let downstream = 0;
+  for (let j = i + 1; j < n; j++) downstream += p[j]; // recalcula tudo
+  total += Math.ceil(downstream / 2);
+}
+```
+
+`O(N^2)`. Com `N = 100.000` são 5×10^9 somas — não termina.
+
+## A solução ótima
+
+A versão de livro monta um array de somas de prefixo e consulta `prefix[n] - prefix[i+1]`. Funciona
+e é `O(N)`, mas gasta `O(N)` de memória à toa. Indo de trás para frente você não precisa do array:
+
+```ts
+let downstream = 0;
+let total = 0;
+for (let i = p.length - 1; i >= 0; i--) {
+  total += Math.ceil(downstream / 2); // custo em i: só o que vem depois
+  downstream += p[i]; // agora o sufixo é "depois de i-1"
+}
+return total;
+```
+
+A ordem das duas linhas é o algoritmo inteiro: somar `p[i]` **depois** de cobrar é o que mantém o
+acumulador significando "estritamente a jusante".
+
+**Complexidade:** tempo `O(N)`, espaço `O(1)`.
+
+## Armadilhas
+
+- **Incluir a própria fábrica.** O filtro em `i` trata o que vem **depois** de `i`. Trocar isso muda
+  todas as respostas e é o erro mais comum.
+- **A última posição custa 0.** Não há nada a jusante. Uma solução que soma `p[n-1]` por engano
+  passa nos exemplos pequenos simétricos e falha em `[7, 0, 0]`.
+- **`Math.round` em vez de `Math.ceil`.** `[1,1,1]` responde `2`, não `1`: `ceil(2/2)=1` e
+  `ceil(1/2)=1`.
+- **Somar antes de arredondar.** O arredondamento é por posição, não no total. `ceil(3/2)+ceil(1/2)`
+  é `3`, e `ceil(4/2)` é `2`.
+- **Overflow.** Com 100.000 fábricas a 10^9 cada, o total passa de 10^13. Cabe num `double`, não num
+  `int` de 32 bits.
+
+## O que o avaliador da Toptal está medindo aqui
+
+Reconhecer soma de prefixo quando o enunciado não usa essa palavra. A pista é "para cada posição,
+alguma coisa sobre o resto do array" — sempre que você ler isso, o laço interno pode virar um
+acumulador. O detalhe que separa os candidatos é perceber que, indo ao contrário, nem o array de
+prefixos é necessário: é a diferença entre saber o padrão e entender o que ele faz.
+
+> **Nota sobre esta questão.** No material de origem os exemplos se contradiziam — o cabeçalho
+> calculava 22 e anunciava 27, e nenhum dos valores citados batia com a única implementação
+> existente. A regra acima foi fixada a partir do código que rodava, não da prosa, e todos os
+> valores esperados foram recalculados a partir dela.

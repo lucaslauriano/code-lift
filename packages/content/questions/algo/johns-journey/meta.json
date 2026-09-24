@@ -1,0 +1,13 @@
+{
+  "slug": "johns-journey",
+  "title": "John's Journey",
+  "type": "algo",
+  "difficulty": "medium",
+  "summary": "Count the distinct routes visiting one city in each of three countries.",
+  "topics": ["counting", "math", "hashing"],
+  "companies": ["toptal"],
+  "estimatedMinutes": 15,
+  "source": "toptal-prep/day2",
+  "track": "codility",
+  "expectedComplexity": { "time": "O(|A| + |B| + |C|)", "space": "O(|A| + |B| + |C|)" }
+}

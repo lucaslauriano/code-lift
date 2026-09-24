@@ -1,0 +1,51 @@
+## A ideia central
+
+Um contador basta. Como os nomes não importam e fechamentos órfãos são ignorados, o único estado
+que interessa é "quantas tags estão abertas agora". Travar em zero **é** a regra de ignorar.
+
+## A solução ingênua
+
+Montar uma pilha de nomes e no fim devolver `stack.length`. Funciona, mas gasta `O(N)` de memória
+para guardar informação que a questão diz explicitamente ser irrelevante.
+
+Pior é a versão com `split`/`match` construindo arrays intermediários de 100.000 elementos — e a
+versão que faz `S = S.replace('<a></a>', '')` em laço, que é `O(N^2)` por realocar a string inteira
+a cada passo.
+
+## A solução ótima
+
+```ts
+let open = 0;
+for (let i = 0; i < s.length; i++) {
+  if (s[i] !== '<') continue;
+  if (s[i + 1] === '/') {
+    if (open > 0) open -= 1; // travar em zero = ignorar o órfão
+  } else {
+    open += 1;
+  }
+}
+return open;
+```
+
+Não precisa nem extrair o nome: só olhar o caractere seguinte ao `<`.
+
+**Complexidade:** tempo `O(N)`, espaço `O(1)`.
+
+## Armadilhas
+
+- **Deixar o contador ficar negativo.** `"</a></a><a>"` responde `1`, não `-1` nem `3`. Sem o
+  `if (open > 0)` o contador guarda crédito e a resposta sai errada.
+- **String vazia.** Responde `0`.
+- **`s[i + 1]` no último caractere.** É `undefined`, que não é `'/'` — cai no ramo de abertura. Como
+  o enunciado garante tags bem formadas, isso nunca acontece; mas se você indexar sem pensar em
+  entradas malformadas, é o tipo de coisa que o entrevistador pergunta.
+- **Confundir com o irmão mais difícil.** Existe uma variação que conta fechamentos órfãos também
+  (o _Broken XML Logger_). Leia qual delas está na sua frente.
+
+## O que o avaliador da Toptal está medindo aqui
+
+Se você reduz o problema antes de codar. A palavra "ignorado" no enunciado elimina a pilha inteira,
+e a frase "nomes não importam" elimina o parsing. Quem escreve uma pilha aqui não está errado — está
+resolvendo um problema maior do que o que foi pedido, e num teste cronometrado isso custa. O
+avaliador também usa essa como aquecimento para a versão bidirecional: se você já chegou no contador
+travado em zero, a próxima é natural.

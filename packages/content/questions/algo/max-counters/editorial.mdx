@@ -8,7 +8,7 @@ ainda está guardado nele.
 
 ```ts
 if (operation === n + 1) {
-  counters.fill(Math.max(...counters));   // O(N)
+  counters.fill(Math.max(...counters)); // O(N)
 }
 ```
 
@@ -27,7 +27,7 @@ Duas variáveis carregam todo o trabalho:
 ```ts
 for (const operation of a) {
   if (operation === n + 1) {
-    floor = peak;          // O(1): só anota, não escreve
+    floor = peak; // O(1): só anota, não escreve
     continue;
   }
   const i = operation - 1;

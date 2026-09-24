@@ -1,0 +1,64 @@
+## A ideia central
+
+Dois contadores que **nunca se cancelam**: fechamentos que chegaram sem nada aberto precisam de uma
+abertura antes deles; o que sobrou aberto no fim precisa de um fechamento depois. Um não paga o
+outro.
+
+## A solução ingênua
+
+O reflexo é um contador só, como na versão simples:
+
+```ts
+let balance = 0;
+for (const tag of tags) balance += tag.closing ? -1 : 1;
+return Math.abs(balance);
+```
+
+Isso responde `1` para `"</app><app><app>"`, e a resposta é `3`. O saldo final é `+1`, mas o
+caminho passou por `-1` — e aquele `-1` é um conserto que já aconteceu e não some porque uma
+abertura apareceu depois. **Saldo final não é o mesmo que consertos necessários.**
+
+É o mesmo erro do problema clássico de parênteses: `")("` precisa de dois consertos, não de zero.
+
+## A solução ótima
+
+```ts
+const open = new Map<string, number>();
+let missingOpenings = 0;
+
+for (const tag of tags) {
+  if (!tag.closing) {
+    open.set(tag.name, (open.get(tag.name) ?? 0) + 1);
+    continue;
+  }
+  const depth = open.get(tag.name) ?? 0;
+  if (depth > 0) open.set(tag.name, depth - 1);
+  else missingOpenings += 1; // órfão: registra e segue
+}
+
+let missingClosings = 0;
+for (const depth of open.values()) missingClosings += depth;
+return missingOpenings + missingClosings;
+```
+
+**Complexidade:** tempo `O(N)`, espaço `O(K)` para `K` nomes distintos.
+
+## Armadilhas
+
+- **`Math.abs(saldo)`.** É a armadilha central. Passa em todos os exemplos simétricos e falha em
+  `"</app><app><app>"`.
+- **Zerar o contador no órfão sem registrar o conserto.** Aí você cai na versão _simples_ do
+  problema, que ignora fechamentos extras. São questões diferentes.
+- **Um contador global em vez de um por nome.** `"<a><b></a></b>"` responde `0` aqui, porque cada
+  nome se equilibra sozinho. Um contador global também daria `0`, mas `"</a><b>"` expõe a diferença:
+  são `2`, e não `0`.
+- **Extrair o nome com regex dentro do laço.** `s.slice` entre `<` e `>` é `O(tamanho da tag)`; uma
+  regex global recompilada por iteração não é.
+
+## O que o avaliador da Toptal está medindo aqui
+
+A distinção entre **estado final** e **trabalho acumulado**. É o mesmo raciocínio de "mínimo de
+inserções para balancear parênteses", e o avaliador sabe que quem responde `Math.abs(saldo)` decorou
+o padrão sem entender por quê. A segunda coisa é se você notou que o enunciado fala em _log_: isso
+justifica o balanceamento por nome e explica por que `<a><b></a></b>` é válido aqui e inválido num
+documento XML.

@@ -1,0 +1,48 @@
+## A ideia central
+
+O array deveria conter todos os valores de `1` a `N+1` e falta exatamente um. Logo, o que falta é a
+diferença entre a soma que ele **deveria** ter e a soma que ele **tem**.
+
+## A solução ingênua
+
+```ts
+for (let v = 1; v <= n + 1; v++) if (!a.includes(v)) return v;
+```
+
+`O(N^2)` — cada `includes` varre o array. Com `N = 100.000` são 5×10^9 comparações.
+
+A versão com `Set` é `O(N)` em tempo mas `O(N)` em espaço, e o enunciado pede `O(1)`.
+
+## A solução ótima
+
+Gauss dá a soma esperada sem laço nenhum: `1 + 2 + … + (N+1) = (N+1)(N+2)/2`.
+
+```ts
+const n = a.length;
+const expected = ((n + 1) * (n + 2)) / 2;
+let actual = 0;
+for (const value of a) actual += value;
+return expected - actual;
+```
+
+**Complexidade:** tempo `O(N)`, espaço `O(1)`.
+
+## Armadilhas
+
+- **Array vazio.** `n = 0` → esperado `(1×2)/2 = 1`, real `0`, resposta `1`. A fórmula acerta
+  sozinha; uma solução baseada em varredura precisa do caso especial.
+- **A faixa é `1..N+1`, não `1..N`.** Errar isso desloca toda a fórmula em um.
+- **Overflow.** Com `N = 100.000` a soma passa de 5×10^9, muito além de um inteiro de 32 bits com
+  sinal. Em JS não há problema (`Number.MAX_SAFE_INTEGER` ≈ 9×10^15), mas em Java ou C# com `int`
+  isso estoura silenciosamente — e é exatamente por isso que os dois casos de performance existem.
+  A alternativa robusta é o XOR: `1 ^ 2 ^ … ^ (N+1) ^ A[0] ^ … ` não soma nada e nunca estoura.
+- **`reduce` sem valor inicial.** Em array vazio, `[].reduce((a, b) => a + b)` lança
+  `TypeError`. Passe o `0`.
+
+## O que o avaliador da Toptal está medindo aqui
+
+Se você enxerga a estrutura em vez de procurar. Todo mundo consegue achar o número que falta; a
+diferença é entre quem varre e quem calcula. O segundo sinal é o array vazio — está no enunciado,
+é o primeiro caso que o Codility roda, e derruba quem começou a codar antes de terminar de ler. E
+se você mencionar o XOR como alternativa sem overflow, mostrou que pensa no problema fora do
+JavaScript.

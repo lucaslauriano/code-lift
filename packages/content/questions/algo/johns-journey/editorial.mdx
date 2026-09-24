@@ -1,0 +1,48 @@
+## A ideia central
+
+Escolhas independentes multiplicam. Duas cidades em A, uma em B e duas em C dão `2 × 1 × 2 = 4`
+rotas. O que eleva a questão acima de uma linha é a palavra **distintas**: uma cidade repetida é
+uma escolha, não duas.
+
+## A solução ingênua
+
+Gerar todas as rotas:
+
+```ts
+const rotas = new Set<string>();
+for (const x of a) for (const y of b) for (const z of c) rotas.add(`${x},${y},${z}`);
+return rotas.size;
+```
+
+Correto e `O(|A|·|B|·|C|)`. Com 100.000 em cada país são 10^15 rotas — não cabe nem em memória nem
+em tempo. Pior: quando o enunciado diz que a resposta pode passar de 10^9, ele está avisando que
+**a resposta não cabe**, quanto mais a enumeração.
+
+## A solução ótima
+
+```ts
+const rotas = new Set(a).size * new Set(b).size * new Set(c).size;
+return rotas > 1_000_000_000 ? -1 : rotas;
+```
+
+Três passagens lineares para montar os conjuntos, uma multiplicação.
+
+**Complexidade:** tempo `O(|A| + |B| + |C|)`, espaço idem.
+
+## Armadilhas
+
+- **Contar entradas em vez de cidades distintas.** `[1, 1, 1]` é uma escolha. É o erro central da
+  questão — quem usa `a.length` passa em todos os exemplos com arrays já sem repetição.
+- **O teto de 10^9.** Com 100.000 distintas por país o produto é 10^15. Tem que devolver `-1`.
+- **Verificar o teto antes de multiplicar, em outra linguagem.** Em JS o produto cabe num `double`
+  e a comparação depois é segura. Em Java com `int` você precisa comparar **antes**, ou o overflow
+  te dá um número pequeno e a verificação passa. Mencionar isso conta ponto.
+- **Contar distintas com `indexOf`.** `a.filter((v, i) => a.indexOf(v) === i).length` é `O(N^2)`.
+  `new Set(a).size` é `O(N)`.
+
+## O que o avaliador da Toptal está medindo aqui
+
+Reconhecer um problema de contagem e **não** enumerar. É a diferença entre quem pensa no tamanho da
+resposta antes de escrever e quem descobre o problema quando o laço não termina. A menção ao teto de
+10^9 no enunciado é um convite explícito: ela existe para você perceber que a saída é gigante e que
+a entrada, portanto, não deve ser percorrida combinatoriamente.

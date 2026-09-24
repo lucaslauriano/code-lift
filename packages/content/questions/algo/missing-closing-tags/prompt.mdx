@@ -1,0 +1,22 @@
+A logger writes lines made of tags. An opening tag looks like `<app>` and a closing tag like
+`</app>`. The log is often truncated, so closing tags go missing.
+
+Count how many closing tags would have to be appended to close everything that was opened.
+
+A closing tag that has nothing open to match is **ignored** — assume the log lost its beginning and
+those openings simply are not in the string. Tag names do not matter for this count.
+
+## Examples
+
+| S                           | answer | why                                           |
+| --------------------------- | ------ | --------------------------------------------- |
+| `"<app><app></app>"`        | `1`    | two opened, one closed                        |
+| `"<app></app></app></app>"` | `0`    | the two extra closings are ignored            |
+| `"<app><app><app>"`         | `3`    | nothing was closed                            |
+| `"</app><app><app>"`        | `2`    | the leading closing is ignored, two stay open |
+
+## Assumptions
+
+- `S` has length within the range `[0 .. 200,000]`.
+- `S` contains only well-formed tags: `<name>` or `</name>`, with `name` made of lowercase letters.
+- Expected worst-case time complexity is `O(N)`, with `O(1)` extra space.

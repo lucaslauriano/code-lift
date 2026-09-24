@@ -24,6 +24,14 @@ export const topicSchema = z.enum([
   'stacks',
   'strings',
   'two-pointers',
+  'binary-search',
+  'dynamic-programming',
+  'graphs',
+  'trees',
+  'linked-lists',
+  'matrix',
+  'parsing',
+  'simulation',
   // javascript / frontend (fases 2+)
   'async',
   'closures',
@@ -53,6 +61,15 @@ export const companySchema = z.enum([
   'shopify',
 ]);
 export type Company = z.infer<typeof companySchema>;
+
+/**
+ * Which body of practice a question belongs to.
+ *
+ * The Codility track is what the Toptal mock preset draws from — a tree traversal has no business
+ * showing up in a timed Codility rehearsal, however good a question it is.
+ */
+export const trackSchema = z.enum(['codility', 'leetcode']);
+export type Track = z.infer<typeof trackSchema>;
 
 export const languageSchema = z.enum(['typescript', 'javascript']);
 export type Language = z.infer<typeof languageSchema>;

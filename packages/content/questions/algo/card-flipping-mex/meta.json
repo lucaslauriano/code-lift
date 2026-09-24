@@ -1,0 +1,16 @@
+{
+  "slug": "card-flipping-mex",
+  "title": "Card Flipping (MEX)",
+  "type": "algo",
+  "difficulty": "hard",
+  "summary": "Repeatedly flip the card at the smallest missing value until 1..N are all present.",
+  "topics": ["simulation", "counting", "hashing"],
+  "companies": ["toptal"],
+  "estimatedMinutes": 30,
+  "source": "toptal-prep/day2 (spec taken from the reference implementation)",
+  "track": "codility",
+  "expectedComplexity": {
+    "time": "O(N log N)",
+    "space": "O(N)"
+  }
+}

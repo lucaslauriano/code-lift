@@ -1,0 +1,79 @@
+## A ideia central
+
+Mantenha o conjunto dos valores ausentes e pegue sempre o mínimo. Cada virada remove um ausente e
+cria **no máximo** um novo — o valor que estava na carta sobrescrita.
+
+## A armadilha que define a questão
+
+Parece óbvio que o MEX só cresce: você virou a carta exatamente para o valor que faltava, então o
+próximo buraco deve estar mais à frente. **É falso.**
+
+Virar a posição `MEX - 1` sobrescreve o que estava lá. Se aquela era a única carta mostrando um
+valor menor, esse valor some e o MEX **volta**.
+
+```
+A = [2, 5, 1, 9], N = 4
+MEX = 3  →  vira a posição 2, que mostrava 1  →  [2, 5, 3, 9]
+agora o 1 sumiu: MEX = 1, e não 4
+```
+
+A resposta é `4`, não `2`. Uma solução com ponteiro que só avança responde `2` e passa em todos os
+exemplos pequenos.
+
+## A solução ingênua
+
+```ts
+while (true) {
+  const mex = smallestMissing(a); // O(N)
+  if (mex > n) break;
+  a[mex - 1] = mex;
+  operations++;
+}
+```
+
+Correta, e `O(N)` por operação. Como podem ocorrer até `N` operações, é `O(N^2)` — 10^10 passos no
+caso de performance em que todas as 100.000 cartas precisam virar.
+
+## A solução ótima
+
+Um min-heap dos ausentes:
+
+```ts
+// count[v] = quantas cartas mostram v, para v em 1..n
+// missing = min-heap dos v com count[v] === 0
+
+const mex = missing.pop();
+const replaced = cards[mex - 1];
+cards[mex - 1] = mex;
+count[mex]++;
+if (inRange(replaced) && --count[replaced] === 0) missing.push(replaced);
+```
+
+Cada virada faz um `pop` e no máximo um `push`, então o total é `O(N log N)`.
+
+**Por que termina:** depois que a posição `i` passa a mostrar `i + 1`, ela nunca mais vira — virá-la
+exigiria que `i + 1` estivesse faltando, e é essa própria carta que o mostra. Logo há no máximo `N`
+operações.
+
+**Complexidade:** tempo `O(N log N)`, espaço `O(N)`.
+
+## Armadilhas
+
+- **Supor que o MEX só cresce.** É a questão inteira.
+- **MEX começa em 1, não em 0.** É a diferença entre a definição de competição e esta.
+- **Valores fora de `1..N`.** Negativos, zero e valores acima de `N` nunca podem ser o MEX — mas
+  podem ocupar a posição que você precisa virar. Ignore-os na contagem, não na leitura.
+- **Mutar o array de entrada.** A solução de referência copia. No code-lift a entrada é clonada por
+  caso, então o bug passa despercebido aqui e não numa prova real.
+- **Recontar com `new Set(a)` a cada rodada.** É `O(N)` por operação disfarçado de uma linha.
+
+## O que o avaliador da Toptal está medindo aqui
+
+Se você testa a própria hipótese. Quase todo candidato chega no ponteiro que só avança — é a
+intuição natural e passa nos exemplos dados. O que separa é procurar um contraexemplo antes de dar o
+problema por resolvido. Num pair programming, a pergunta que vem é exatamente "o MEX pode diminuir?",
+e a resposta certa não é "acho que não".
+
+> **Nota sobre esta questão.** No material de origem, o valor esperado de `[1, 3, 5, 7]` estava como
+> `2`; a simulação correta dá `3` — e a própria implementação de referência de lá também dá `3`. Os
+> valores aqui foram recalculados a partir da simulação.

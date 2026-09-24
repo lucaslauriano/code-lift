@@ -1,0 +1,25 @@
+John is planning a trip through three countries. Arrays `A`, `B` and `C` list the city IDs he is
+willing to visit in each country. A list may name the same city more than once.
+
+A route visits exactly one city from `A`, one from `B` and one from `C`. Two routes are the same
+when they use the same three cities.
+
+Return the number of distinct routes. If that number exceeds `1,000,000,000`, return `-1`.
+
+## Examples
+
+| A           | B        | C        | answer |
+| ----------- | -------- | -------- | ------ |
+| `[2, 1, 1]` | `[4, 4]` | `[5, 6]` | `4`    |
+| `[1, 2, 3]` | `[4, 5]` | `[6]`    | `6`    |
+| `[1, 1, 1]` | `[2]`    | `[3]`    | `1`    |
+
+In the first example `A` offers two distinct cities, `B` offers one and `C` offers two, so there are
+`2 × 1 × 2 = 4` routes.
+
+## Assumptions
+
+- Each array is non-empty and holds at most `100,000` integers.
+- Each city ID is an integer within the range `[1 .. 1,000,000,000]`.
+- City IDs are unique across countries — the same ID never appears in two different arrays.
+- Return `-1` when the count exceeds `1,000,000,000`.

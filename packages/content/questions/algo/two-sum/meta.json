@@ -1,0 +1,13 @@
+{
+  "slug": "two-sum",
+  "title": "Two Sum",
+  "type": "algo",
+  "difficulty": "easy",
+  "summary": "Find the two indices whose values add up to a target.",
+  "topics": ["hashing", "arrays"],
+  "companies": ["toptal", "google", "amazon"],
+  "estimatedMinutes": 12,
+  "source": "toptal-prep/day1",
+  "track": "codility",
+  "expectedComplexity": { "time": "O(N)", "space": "O(N)" }
+}

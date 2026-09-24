@@ -65,6 +65,7 @@ export class QuestionsService {
       })
       .filter((question) => {
         if (query.type && question.type !== query.type) return false;
+        if (query.track && question.track !== query.track) return false;
         if (query.difficulty && question.difficulty !== query.difficulty) return false;
         if (query.topic && !question.topics.includes(query.topic)) return false;
         if (query.company && !question.companies.includes(query.company)) return false;

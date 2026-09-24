@@ -1,0 +1,67 @@
+## A ideia central
+
+Uma pilha resolve o aninhamento, e um contador por nome é o que mantém a solução linear: "esse nome
+está aberto em algum lugar?" precisa ser `O(1)`, não uma busca na pilha.
+
+## A solução ingênua
+
+```ts
+// no fechamento, procura o nome na pilha
+const idx = stack.lastIndexOf(name);
+```
+
+`lastIndexOf` é `O(profundidade)`. Com 50.000 níveis de aninhamento e 100.000 tags isso é
+`O(N^2)` — o caso de performance `deeplyNested` existe exatamente para reprovar isso.
+
+Pior ainda é a versão `while (s !== anterior) s = s.replace(/<(\w+)><\/\1>/, '')`, que realoca a
+string inteira a cada par removido.
+
+## A solução ótima
+
+```ts
+const stack: string[] = [];
+const openPerName = new Map<string, number>();
+let missing = 0;
+
+// abertura
+stack.push(name);
+openPerName.set(name, (openPerName.get(name) ?? 0) + 1);
+
+// fechamento
+if ((openPerName.get(name) ?? 0) === 0) {
+  missing += 1; // não há o que fechar
+} else {
+  for (;;) {
+    // desempilha até o par
+    const top = stack.pop()!;
+    openPerName.set(top, openPerName.get(top)! - 1);
+    if (top === name) break;
+    missing += 1; // pulou por cima de um não fechado
+  }
+}
+
+return missing + stack.length;
+```
+
+O laço interno parece quadrático e não é: ao longo de toda a string, cada tag é empilhada uma vez e
+desempilhada uma vez. O custo total dos desempilhamentos é `O(N)`.
+
+**Complexidade:** tempo `O(N)`, espaço `O(N)`.
+
+## Armadilhas
+
+- **Confundir com os dois irmãos.** Existem três versões deste problema: contador travado em zero
+  (nomes irrelevantes), saldo por nome (log, sem aninhamento) e esta, com pilha e nomes. Ler qual
+  está na sua frente vale mais que escrever rápido.
+- **`<a><b></a></b>` responde `2`, não `0`.** `</a>` pula `b` (+1) e depois `</b>` não tem nada
+  aberto (+1). Num log seria válido; num documento não é.
+- **Buscar na pilha.** É o que transforma `O(N)` em `O(N^2)`.
+- **Esquecer `stack.length` no fim.** Consome tudo sem erro e devolve um número baixo demais.
+- **Extrair o nome com regex por iteração.** `indexOf('>')` + `slice` é `O(tamanho da tag)`.
+
+## O que o avaliador da Toptal está medindo aqui
+
+Duas coisas de uma vez: se você reconhece a pilha, e se você percebe que a busca ingênua dentro dela
+é o gargalo. A primeira todo mundo tem; a segunda separa. Se você explicar por que o laço de
+desempilhamento é amortizado `O(1)` — cada tag entra e sai uma vez — você mostrou que sabe analisar
+complexidade, e não só reconhecê-la.

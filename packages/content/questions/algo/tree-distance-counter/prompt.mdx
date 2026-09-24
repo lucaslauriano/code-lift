@@ -1,0 +1,27 @@
+A country has `N` cities numbered `0` to `N - 1`, connected by `N - 1` two-way roads that form a
+tree. The roads are given as an array `T`, where `T[i]` is the city on the other end of the road
+from city `i`.
+
+Exactly one city is the capital, and it is marked by `T[i] === i` — a road from a city to itself,
+which is not a real road.
+
+Return an array where position `k` holds the number of cities at distance `k + 1` from the capital.
+The array runs up to the largest distance that actually occurs; the capital itself is at distance
+`0` and is never counted.
+
+## Example
+
+Given `T = [9, 1, 4, 9, 0, 4, 8, 9, 0, 1]`:
+
+`T[1] === 1`, so city `1` is the capital. The answer is `[1, 3, 2, 3]` — one city is one road away,
+three cities are two roads away, two are three away and three are four away. That accounts for all
+nine cities other than the capital.
+
+For `T = [0]` the country is a single city, which is the capital, so the answer is `[]`.
+
+## Assumptions
+
+- `N` is an integer within the range `[1 .. 100,000]`.
+- Each element of `T` is an integer within the range `[0 .. N - 1]`.
+- Exactly one city satisfies `T[i] === i`, and the roads form a tree — every city is reachable.
+- Expected worst-case time complexity is `O(N)`.

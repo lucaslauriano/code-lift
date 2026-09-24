@@ -26,15 +26,19 @@ Isso aceita `"([)]"`, que está errado — a contagem bate mas o aninhamento nã
 ## A solução ótima
 
 ```ts
-const CLOSERS = new Map([[')', '('], [']', '['], ['}', '{']]);
+const CLOSERS = new Map([
+  [')', '('],
+  [']', '['],
+  ['}', '{'],
+]);
 const stack: string[] = [];
 
 for (const character of s) {
   const expected = CLOSERS.get(character);
   if (expected === undefined) {
-    stack.push(character);          // é uma abertura
+    stack.push(character); // é uma abertura
   } else if (stack.pop() !== expected) {
-    return 0;                       // fechou o que não estava aberto
+    return 0; // fechou o que não estava aberto
   }
 }
 return stack.length === 0 ? 1 : 0;
@@ -55,7 +59,7 @@ então o caso "fechamento sem abertura" cai no mesmo ramo, de graça.
 - **Contar em vez de empilhar.** `"([)]"` tem um de cada, balanceado na contagem, e é inválido.
 - **Tipos trocados no meio.** `"{[(])}"` — a pilha pega, a contagem não.
 - **`for (const c of s)` vs `s[i]`.** Para ASCII puro tanto faz; o iterador de string do JS percorre
-  *code points*, o índice percorre *code units*. Aqui o alfabeto é garantido ASCII, mas é a distinção
+  _code points_, o índice percorre _code units_. Aqui o alfabeto é garantido ASCII, mas é a distinção
   que importa em qualquer questão de string com acentos ou emoji.
 
 ## O que o avaliador da Toptal está medindo aqui
