@@ -27,7 +27,8 @@
     "cookie-parser": "catalog:",
     "reflect-metadata": "catalog:",
     "rxjs": "catalog:",
-    "zod": "catalog:"
+    "zod": "catalog:",
+    "dotenv": "^18.0.3"
   },
   "devDependencies": {
     "@code-lift/config": "workspace:*",
@@ -36,7 +37,6 @@
     "@types/cookie-parser": "catalog:",
     "@types/node": "catalog:",
     "@types/supertest": "catalog:",
-    "dotenv": "^18.0.3",
     "eslint": "catalog:",
     "supertest": "catalog:",
     "tsx": "catalog:",

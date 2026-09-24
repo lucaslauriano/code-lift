@@ -9,6 +9,8 @@ export default defineConfig({
     // e2e specs share one Postgres schema; running them in parallel would have them fight over rows.
     fileParallelism: false,
     globalSetup: ['./test/global-setup.ts'],
+    // Must run before any import chain reaches AppModule; see test/test-env.ts for why.
+    setupFiles: ['./test/test-env.ts'],
   },
   plugins: [
     // esbuild (Vitest's default transform) does not emit decorator metadata, which is exactly what

@@ -1,19 +1,16 @@
-import { resolve } from 'node:path';
-import { config } from 'dotenv';
 import cookieParser from 'cookie-parser';
 import request from 'supertest';
 import type { Server } from 'node:http';
 import { Test } from '@nestjs/testing';
 import type { INestApplication } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { AppModule } from '../src/app.module';
 import { PrismaService } from '../src/prisma/prisma.service';
 import { AuthService } from '../src/auth/auth.service';
 import { SESSION_COOKIE } from '../src/config/env';
 
-config({ path: resolve(__dirname, '../../../.env'), quiet: true });
-
-// Every e2e spec talks to the throwaway database created in global-setup.
-process.env['DATABASE_URL'] = process.env['TEST_DATABASE_URL'] ?? '';
+// The environment is prepared in test/test-env.ts, which Vitest loads as a setup file — early
+// enough to beat AppModule's eager config read. Doing it here would be too late.
 
 export interface TestApp {
   app: INestApplication;
@@ -35,6 +32,18 @@ export async function createTestApp(): Promise<TestApp> {
   await app.init();
 
   const prisma = app.get(PrismaService);
+
+  // Refuse to run against anything but the throwaway database.
+  //
+  // This is not paranoia: the suite silently used the development database for its whole first
+  // life, because @nestjs/config let the .env file override the DATABASE_URL set here. Everything
+  // passed — it was just mutating the wrong rows. A test setup that lies is worse than none.
+  const connected = app.get(ConfigService).get<string>('DATABASE_URL');
+  if (connected !== process.env['TEST_DATABASE_URL']) {
+    throw new Error(
+      `The test app connected to ${connected ?? '(unset)'}, not TEST_DATABASE_URL. Refusing to run.`,
+    );
+  }
 
   return {
     app,
