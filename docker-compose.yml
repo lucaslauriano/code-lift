@@ -7,7 +7,7 @@ services:
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-codelift}
       POSTGRES_DB: ${POSTGRES_DB:-codelift}
     ports:
-      - '${POSTGRES_PORT:-5432}:5432'
+      - '${POSTGRES_PORT:-5434}:5432'
     volumes:
       - postgres-data:/var/lib/postgresql/data
     healthcheck:
@@ -15,6 +15,58 @@ services:
       interval: 5s
       timeout: 5s
       retries: 10
+
+  api:
+    build:
+      # Context is the repo root, not apps/api: pnpm workspace links mean a single app cannot be
+      # installed on its own.
+      context: .
+      dockerfile: apps/api/Dockerfile
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      NODE_ENV: production
+      # Inside the compose network the database is reachable by service name on its own port.
+      DATABASE_URL: postgresql://${POSTGRES_USER:-codelift}:${POSTGRES_PASSWORD:-codelift}@postgres:5432/${POSTGRES_DB:-codelift}?schema=public
+      API_PORT: ${API_PORT:-3334}
+      JWT_SECRET: ${JWT_SECRET:?set JWT_SECRET in .env}
+      JWT_EXPIRES_IN: ${JWT_EXPIRES_IN:-30d}
+      WEB_ORIGIN: ${WEB_ORIGIN:-http://localhost:3010}
+      COOKIE_SECURE: ${COOKIE_SECURE:-false}
+      SEED_USER_EMAIL: ${SEED_USER_EMAIL:-me@code-lift.local}
+      SEED_USER_PASSWORD: ${SEED_USER_PASSWORD:?set SEED_USER_PASSWORD in .env}
+      SEED_USER_NAME: ${SEED_USER_NAME:-code-lift}
+    ports:
+      - '${API_PORT:-3334}:${API_PORT:-3334}'
+    healthcheck:
+      test: ['CMD-SHELL', 'wget -qO- http://localhost:${API_PORT:-3334}/health || exit 1']
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 40s
+
+  web:
+    build:
+      context: .
+      dockerfile: apps/web/Dockerfile
+      args:
+        # Baked at build time: the browser calls the API directly, so this must be the URL as seen
+        # from the host, not the compose service name.
+        NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-http://localhost:3334}
+    restart: unless-stopped
+    depends_on:
+      api:
+        condition: service_healthy
+    environment:
+      NODE_ENV: production
+      NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-http://localhost:3334}
+      # The Next server is inside the network, so it reaches the API by service name. The browser
+      # bundle above cannot use this address.
+      API_INTERNAL_URL: http://api:${API_PORT:-3334}
+    ports:
+      - '${WEB_PORT:-3010}:3010'
 
 volumes:
   postgres-data:
